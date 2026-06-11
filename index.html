@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPMB SMPN 1 BULUKUMBA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --primary: #3b82f6; --success: #10b981; --danger: #ef4444; --bg-app: #f8fafc; }
+        body { background-color: #cbd5e1; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        .app-container { width: 100vw; max-width: 480px; height: 100vh; max-height: 850px; background: var(--bg-app); position: relative; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        @media (max-width: 480px) { .app-container { max-width: 100vw; max-height: 100vh; height: 100vh; } }
+        
+        .screen { display: none !important; width: 100%; height: 100%; flex-direction: column; overflow-y: auto; background-color: var(--bg-app); animation: slideUp 0.3s ease-out forwards; }
+        .screen.active { display: flex !important; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Modern Wizard Steps */
+        .step-container { display: none; }
+        .step-container.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Premium Forms */
+        .card-form { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border-radius: 20px; padding: 22px; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.6); margin-bottom: 24px;}
+        .form-label { font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 8px; display: block;}
+        .form-control, .form-select { border-radius: 12px; padding: 12px 14px; font-size: 13px; font-weight: 600; color: #1e293b; background-color: #f1f5f9; border: 1.5px solid transparent; transition: all 0.25s ease; }
+        .form-control:focus, .form-select:focus { background-color: #ffffff; border-color: var(--primary); box-shadow: 0 4px 15px -3px rgba(59, 130, 246, 0.2); outline: none; }
+        
+        .input-filled { border-color: var(--success) !important; background-color: #f0fdf4 !important; }
+        .invalid-nik { border-color: var(--danger) !important; background-color: #fef2f2 !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+        .required-star { color: var(--danger); }
+        
+        /* Gradient Section Title */
+        .section-badge { display: inline-flex; items-center: center; gap: 8px; background: linear-gradient(135deg, #2563eb, #4f46e5); padding: 10px 16px; border-radius: 14px; box-shadow: 0 4px 15px -3px rgba(37, 99, 235, 0.4); margin-bottom: 20px; margin-left: -5px; }
+        
+        /* UI Elements */
+        .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+        
+        .screen::-webkit-scrollbar { width: 0px; }
+        .disabled-section { opacity: 0.4; pointer-events: none; filter: grayscale(100%); }
+        
+        .nik-error { color: var(--danger); font-size: 10px; font-weight: 700; display: none; background: #fee2e2; padding: 2px 8px; border-radius: 4px;}
+        .nik-error.show { display: inline-block; animation: shake 0.4s ease-in-out; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-3px);} 75% {transform: translateX(3px);} }
+        
+        /* Modern Pill Buttons */
+        .btn-modern { padding: 12px 20px; font-size: 13px; font-weight: 800; border-radius: 14px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        /* Toast Alert */
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: white; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: bold; opacity: 0; transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 9999; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); }
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* Home Layout */
+        #screenHome { display: none; flex-direction: column; overflow: hidden; }
+        #screenHome.active { display: flex !important; }
+
+        #homeScrollArea {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+        }
+
+        /* Bottom Nav Layout (Digunakan di Home & Pengumuman) */
+        .bottom-nav-layout {
+            flex-shrink: 0;
+            background: #fff;
+            border-top: 1px solid #e2e8f0;
+            padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+            z-index: 200;
+            box-shadow: 0 -4px 20px -2px rgba(0,0,0,0.08);
+        }
+
+        .card-jalur { transition: transform 0.18s ease, box-shadow 0.18s ease; }
+        .card-jalur:active { transform: scale(0.97); }
+
+        @keyframes wiggle {
+            0%,100% { transform: rotate(0deg); }
+            25%      { transform: rotate(-3deg); }
+            75%      { transform: rotate(3deg); }
+        }
+        .bn-btn {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 4px; background: none; border: none; cursor: pointer;
+            padding: 4px 8px; min-width: 52px; margin-top: 0;
+            box-shadow: 0 4px 12px -2px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bn-btn:active { transform: scale(0.92) translateY(2px); }
+        .bn-btn-center {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 4px; background: none; border: none; cursor: pointer;
+            padding: 4px 8px; min-width: 68px; margin-top: 0;
+            border-radius: 12px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bn-btn-center:active { transform: scale(0.92) translateY(2px); }
+
+        /* Transparent Card Fallback & Overlay */
+        #loginOverlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
+            background-color: rgba(0,0,0,0.55);
+        }
+        #loginCard {
+            position: relative; z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            padding: 32px 24px; border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        @media (max-width: 768px) {
+            #loginOverlay { background-color: rgba(0,0,0,0.65) !important; }
+            #loginCard {
+                background: rgba(255,255,255,0.96) !important;
+                backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+                border: 1px solid rgba(255,255,255,0.4) !important;
+                border-radius: 20px !important;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important;
+            }
+            #loginCard h1 { color: #1e3a8a !important; }
+            #loginCard p { color: #3b82f6 !important; }
+        }
+
+        .input-wrapper { position: relative; width: 100%; margin-bottom: 20px; }
+        #inputKode {
+            width: 100%; height: 56px; border-radius: 12px; border: 2px solid #e5e7eb;
+            background: #ffffff; font-size: 18px; letter-spacing: 2px; text-align: center;
+            font-weight: 600; padding-left: 48px; color: #1f2937; text-transform: uppercase;
+            transition: all 0.3s ease; outline: none; box-sizing: border-box;
+        }
+        #inputKode::placeholder { color: #9ca3af; letter-spacing: normal; font-weight: 500; font-size: 14px; }
+        #inputKode:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,0.15); }
+        .icon-kode {
+            position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+            color: #9ca3af; font-size: 18px; pointer-events: none; transition: all 0.3s ease;
+        }
+        #inputKode:focus ~ .icon-kode { color: #2563eb; }
+        #labelKode {
+            position: absolute; top: -8px; left: 16px; font-size: 12px; font-weight: 700;
+            color: #2563eb; background: #ffffff; padding: 0 6px; border-radius: 4px;
+            opacity: 0; visibility: hidden; transform: translateY(4px); transition: all 0.3s ease; pointer-events: none;
+        }
+        #inputKode:focus ~ #labelKode, #inputKode.has-value ~ #labelKode { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        .btn-masuk-premium {
+            width: 100%; height: 56px; border-radius: 12px; font-weight: 700; color: #ffffff;
+            background: linear-gradient(135deg, #1e40af, #3b82f6); border: none;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 10px 15px -3px rgba(37,99,235,0.3); transition: all 0.3s ease; cursor: pointer;
+        }
+        .btn-masuk-premium:hover { transform: scale(1.02); box-shadow: 0 15px 25px -5px rgba(37,99,235,0.4); }
+        .btn-masuk-premium:active { transform: scale(0.98); }
+
+        /* ── ANIMASI & VISUAL PENGUMUMAN (PREMIUM) ── */
+        @keyframes pulseCount { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59,130,246,0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 25px rgba(59,130,246,0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59,130,246,0); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.9) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+
+        /* TAMBAHAN JADWAL: Timeline CSS (REVISI PALET WARNA HIJAU MERAH ABU) */
+        .timeline-container { position: relative; padding-left: 2rem; margin-top: 1rem; }
+        .timeline-line { position: absolute; left: 0.75rem; top: 0; bottom: 0; width: 2px; background-color: #e2e8f0; }
+        .timeline-item { position: relative; margin-bottom: 2rem; }
+        .timeline-dot { 
+            position: absolute; left: -2rem; top: 0.25rem; width: 1.5rem; height: 1.5rem; 
+            border-radius: 50%; border: 4px solid #f8fafc; z-index: 10;
+        }
+        
+        .dot-green-pulse { background-color: #22c55e; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2); animation: pulseGreen 2s infinite; }
+        .dot-red { background-color: #ef4444; }
+        .dot-gray { background-color: #9ca3af; }
+        .dot-yellow { background-color: #f59e0b; }
+        
+        @keyframes pulseGreen {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        
+        .timeline-card {
+            background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+            padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            position: relative; overflow: hidden;
+        }
+        .banner-yellow {
+            background-color: #fef08a; color: #854d0e; font-size: 0.7rem; font-weight: 700;
+            padding: 4px 8px; text-transform: uppercase; text-align: center;
+            border-bottom: 1px solid #fde047; margin: -1rem -1rem 1rem -1rem;
+        }
+
+        /* INJEKSI INFORMASI - CSS TABS & CARD (REVISI TAB PATEN 1 LAYAR) */
+        .info-tab-wrapper { display: flex; justify-content: space-between; width: 100%; padding: 0 4px; box-sizing: border-box; }
+        .info-tab-btn { flex: 1; text-align: center; padding: 12px 2px; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0px; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.3s ease; outline: none; -webkit-tap-highlight-color: transparent; white-space: nowrap; }
+        @media (min-width: 380px) { .info-tab-btn { font-size: 12px; } }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <!-- LOADER -->
+    <!-- REVISI: Bg solid putih untuk menutupi layar login & inline script untuk mencegah kedip saat refresh -->
+    <div id="loader" class="absolute inset-0 bg-white z-[1000] flex-col items-center justify-center backdrop-blur-md" style="display: none;">
+        <div class="spinner-border text-blue-600 mb-3" style="width: 2.5rem; height: 2.5rem;" role="status"></div>
+        <span id="loaderText" class="text-xs font-extrabold text-slate-700 tracking-wider uppercase">Memuat data...</span>
+    </div>
+    <script>
+        // Memaksa layar putih penuh dan membunuh screenLogin SEBELUM browser selesai merender
+        if (localStorage.getItem('spmb_session')) {
+            document.getElementById('loader').style.display = 'flex';
+            document.write('<style>#screenLogin { display: none !important; }</style>');
+        }
+    </script>
+
+    <!-- TOAST BACKGROUND SAVE -->
+    <div id="toast"><i class="fas fa-cloud-upload-alt text-blue-400 mr-2"></i> Menyimpan draft otomatis...</div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="screenLogin" class="screen active p-8 flex items-center justify-center" style="background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div id="loginOverlay"></div>
+        <div id="loginCard" class="w-full max-w-sm mt-2">
+            <div class="text-center mb-10 mt-2">
+                <h1 class="text-white text-3xl font-black mb-1 tracking-tight">PORTAL SPMB</h1>
+                <p class="text-blue-200 text-xs font-bold tracking-widest">SMP Negeri 1 Bulukumba</p>
+            </div>
+            
+            <form id="formLogin" onsubmit="event.preventDefault(); prosesLogin(); return false;">
+                <div class="input-wrapper">
+                    <input type="text" id="inputKode" placeholder="KODE FORMULIR" required autocomplete="off" oninput="this.value ? this.classList.add('has-value') : this.classList.remove('has-value')">
+                    <i class="fas fa-key icon-kode"></i>
+                    <span id="labelKode">Masukkan 13 Digit Kode</span>
+                </div>
+                <button type="submit" class="btn-masuk-premium">
+                    LOGIN <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            <div id="errorBox" class="bg-red-500 text-white p-3 rounded-xl mt-5 hidden text-xs font-bold text-center shadow-lg"></div>
+        </div>
+    </div>
+
+    <!-- LOCKED SCREEN (PREMIUM DOWNLOAD BOX) -->
+    <div id="screenLocked" class="screen flex items-center justify-center p-6 text-center bg-slate-50">
+        <div class="w-full max-w-sm">
+            <div class="bg-gradient-to-br from-[#1e3a8a] to-[#1e40af] p-8 rounded-2xl shadow-lg border border-blue-700/50 relative overflow-hidden">
+                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/5 rounded-full blur-xl"></div>
+                <div class="absolute bottom-0 left-0 -mb-4 -ml-4 w-20 h-20 bg-blue-400/10 rounded-full blur-lg"></div>
+                
+                <div class="relative z-10">
+                    <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20 shadow-inner backdrop-blur-sm">
+                        <i class="fas fa-lock text-3xl text-blue-200"></i>
+                    </div>
+                    <h2 class="text-xl font-black text-white mb-2 tracking-wide">DATA TERKUNCI</h2>
+                    <p class="text-[11px] font-medium text-blue-100 mb-6 leading-relaxed opacity-90">
+                        Biodata Anda telah valid dan tersimpan permanen di sistem kami. Silakan unduh dokumen bukti pendaftaran Anda di bawah ini.
+                    </p>
+                    
+                    <button type="button" onclick="downloadPDF()" class="w-full bg-white hover:bg-slate-50 text-slate-800 font-extrabold py-3.5 rounded-xl flex items-center justify-center gap-3 mb-2 shadow-[0_4px_15px_-3px_rgba(255,255,255,0.3)] transition-all duration-300 hover:scale-105 active:scale-95">
+                        <i class="fas fa-file-pdf text-2xl text-[#ef4444]"></i> UNDUH BUKTI DAFTAR
+                    </button>
+                    <p id="statusPdf" class="text-[10px] font-bold text-blue-200 mb-4 min-h-[15px]"></p>
+                    
+                    <button type="button" onclick="changeScreen('screenHome')" class="text-[11px] font-bold text-white/70 hover:text-white transition-colors uppercase tracking-wider flex items-center justify-center gap-1 mx-auto">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Beranda
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HOME SCREEN -->
+    <div id="screenHome" class="screen" style="background:#eef2f7; overflow:hidden; display:flex; flex-direction:column">
+        <div id="homeScrollArea">
+            <div style="background:linear-gradient(160deg,#1a3fbf 0%,#2563eb 60%,#3b82f6 100%);padding:3.8rem 1.6rem 5.8rem;position:relative;overflow:hidden">
+                <div style="position:absolute;top:-60px;right:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.06)"></div>
+                <div style="position:absolute;bottom:-40px;left:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.04)"></div>
+                <h2 style="color:#fff;font-size:1.75rem;font-weight:900;margin:0 0 0.6rem;letter-spacing:-0.02em">Halo, Calon Murid Baru! 👋</h2>
+                <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.15);padding:8px 16px;border-radius:50px;backdrop-filter:blur(8px)">
+                    <i class="fas fa-id-badge" style="color:#93c5fd;font-size:0.85rem"></i>
+                    <span id="displayKodeUser" style="color:#fff;font-weight:900;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase"></span>
+                </div>
+            </div>
+
+            <div style="padding:0 1.2rem 1.5rem;margin-top:-2.8rem;position:relative;z-index:10">
+                <p style="font-size:0.7rem;font-weight:800;color:#334155;letter-spacing:0.1em;text-transform:uppercase;margin:0 0 0.9rem 0.2rem">Jalur Pendaftaran</p>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+                    <!-- Domisili -->
+                    <div onclick="void(0)" style="background:#fff;border-radius:1.25rem;padding:1.4rem 1rem 1.2rem;box-shadow:0 6px 24px -4px rgba(37,99,235,0.13),0 2px 8px -2px rgba(0,0,0,0.06);border:1px solid #e2e8f0;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:default;transition:transform 0.18s ease,box-shadow 0.18s ease;-webkit-tap-highlight-color:transparent" ontouchstart="this.style.transform='scale(0.97)';this.style.boxShadow='0 2px 10px -4px rgba(37,99,235,0.12)'" ontouchend="this.style.transform='scale(1)';this.style.boxShadow='0 6px 24px -4px rgba(37,99,235,0.13),0 2px 8px -2px rgba(0,0,0,0.06)'">
+                        <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px -3px rgba(37,99,235,0.25)">
+                            <i class="fas fa-house-chimney" style="font-size:1.35rem;color:#2563eb"></i>
+                        </div>
+                        <div style="text-align:center">
+                            <div style="font-size:0.83rem;font-weight:900;color:#1e293b">Domisili</div>
+                            <div style="font-size:0.65rem;font-weight:600;color:#94a3b8;margin-top:2px">Caile, Ela-Ela, Kalumeme</div>
+                        </div>
+                    </div>
+                    <!-- Prestasi -->
+                    <div onclick="void(0)" style="background:#fff;border-radius:1.25rem;padding:1.4rem 1rem 1.2rem;box-shadow:0 6px 24px -4px rgba(217,119,6,0.13),0 2px 8px -2px rgba(0,0,0,0.06);border:1px solid #e2e8f0;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:default;transition:transform 0.18s ease,box-shadow 0.18s ease;-webkit-tap-highlight-color:transparent" ontouchstart="this.style.transform='scale(0.97)';this.style.boxShadow='0 2px 10px -4px rgba(217,119,6,0.12)'" ontouchend="this.style.transform='scale(1)';this.style.boxShadow='0 6px 24px -4px rgba(217,119,6,0.13),0 2px 8px -2px rgba(0,0,0,0.06)'">
+                        <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#fef9c3,#fde68a);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px -3px rgba(217,119,6,0.25)">
+                            <i class="fas fa-trophy" style="font-size:1.35rem;color:#d97706"></i>
+                        </div>
+                        <div style="text-align:center">
+                            <div style="font-size:0.83rem;font-weight:900;color:#1e293b">Prestasi</div>
+                            <div style="font-size:0.65rem;font-weight:600;color:#94a3b8;margin-top:2px">Akademik & Non-Akademik</div>
+                        </div>
+                    </div>
+                    <!-- Afirmasi -->
+                    <div onclick="void(0)" style="background:#fff;border-radius:1.25rem;padding:1.4rem 1rem 1.2rem;box-shadow:0 6px 24px -4px rgba(22,163,74,0.13),0 2px 8px -2px rgba(0,0,0,0.06);border:1px solid #e2e8f0;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:default;transition:transform 0.18s ease,box-shadow 0.18s ease;-webkit-tap-highlight-color:transparent" ontouchstart="this.style.transform='scale(0.97)';this.style.boxShadow='0 2px 10px -4px rgba(22,163,74,0.12)'" ontouchend="this.style.transform='scale(1)';this.style.boxShadow='0 6px 24px -4px rgba(22,163,74,0.13),0 2px 8px -2px rgba(0,0,0,0.06)'">
+                        <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#dcfce7,#bbf7d0);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px -3px rgba(22,163,74,0.25)">
+                            <i class="fas fa-hand-holding-heart" style="font-size:1.35rem;color:#16a34a"></i>
+                        </div>
+                        <div style="text-align:center">
+                            <div style="font-size:0.83rem;font-weight:900;color:#1e293b">Afirmasi</div>
+                            <div style="font-size:0.65rem;font-weight:600;color:#94a3b8;margin-top:2px">Kurang Mampu / Disabilitas</div>
+                        </div>
+                    </div>
+                    <!-- Mutasi -->
+                    <div onclick="void(0)" style="background:#fff;border-radius:1.25rem;padding:1.4rem 1rem 1.2rem;box-shadow:0 6px 24px -4px rgba(124,58,237,0.13),0 2px 8px -2px rgba(0,0,0,0.06);border:1px solid #e2e8f0;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:default;transition:transform 0.18s ease,box-shadow 0.18s ease;-webkit-tap-highlight-color:transparent" ontouchstart="this.style.transform='scale(0.97)';this.style.boxShadow='0 2px 10px -4px rgba(124,58,237,0.12)'" ontouchend="this.style.transform='scale(1)';this.style.boxShadow='0 6px 24px -4px rgba(124,58,237,0.13),0 2px 8px -2px rgba(0,0,0,0.06)'">
+                        <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#ede9fe,#ddd6fe);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px -3px rgba(124,58,237,0.25)">
+                            <i class="fas fa-right-left" style="font-size:1.35rem;color:#7c3aed"></i>
+                        </div>
+                        <div style="text-align:center">
+                            <div style="font-size:0.83rem;font-weight:900;color:#1e293b">Mutasi</div>
+                            <div style="font-size:0.65rem;font-weight:600;color:#94a3b8;margin-top:2px">Pindah Tugas Orang Tua</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info status draft -->
+                <div id="infoDraft" style="display:none;background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:10px 14px;margin-bottom:4px;display:flex;align-items:center;gap:10px">
+                    <i class="fas fa-clock" style="color:#f97316;font-size:1rem;flex-shrink:0"></i>
+                    <div>
+                        <div style="font-size:0.72rem;font-weight:800;color:#c2410c">Draft Tersimpan</div>
+                        <div id="lblStatusDraft" style="font-size:0.65rem;color:#9a3412;font-weight:600">Lanjutkan pengisian formulir Anda</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAV LAYOUT -->
+        <div class="bottom-nav-layout">
+            <div style="display:flex;align-items:center;justify-content:space-around">
+                <button type="button" class="bn-btn" onclick="var ic=this.querySelector('.bn-icon');ic.style.animation='none';void ic.offsetWidth;ic.style.animation='wiggle 0.3s ease';bukaScreenInformasi()">
+                    <div class="bn-icon" style="width:36px;height:36px;border-radius:12px;background:#ecfdf5;display:flex;align-items:center;justify-content:center">
+                        <i class="fas fa-info-circle" style="color:#10b981;font-size:1rem"></i>
+                    </div>
+                    <span style="font-size:0.6rem;font-weight:600;color:#94a3b8">Informasi</span>
+                </button>
+                <!-- TAMBAHAN JADWAL: Update onclick untuk Jadwal -->
+                <button type="button" class="bn-btn" onclick="var ic=this.querySelector('.bn-icon');ic.style.animation='none';void ic.offsetWidth;ic.style.animation='wiggle 0.3s ease'; bukaScreenJadwal();">
+                    <div class="bn-icon" style="width:36px;height:36px;border-radius:12px;background:#fff7ed;display:flex;align-items:center;justify-content:center">
+                        <i class="fas fa-calendar-check" style="color:#f97316;font-size:1rem"></i>
+                    </div>
+                    <span style="font-size:0.6rem;font-weight:600;color:#94a3b8">Jadwal</span>
+                </button>
+                <button type="button" class="bn-btn-center" onclick="var ic=this.querySelector('.bn-icon-c');ic.style.animation='none';void ic.offsetWidth;ic.style.animation='wiggle 0.3s ease';bukaDaftar()">
+                    <div class="bn-icon-c" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(145deg,#2563eb,#3b82f6);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px -4px rgba(37,99,235,0.5),0 0 0 5px #dbeafe">
+                        <i class="fas fa-user-edit" style="color:#fff;font-size:1.2rem"></i>
+                    </div>
+                    <span style="font-size:0.6rem;font-weight:900;color:#2563eb;text-align:center;line-height:1.2">Lengkapi<br>Biodata</span>
+                </button>
+                <button type="button" class="bn-btn" onclick="var ic=this.querySelector('.bn-icon');ic.style.animation='none';void ic.offsetWidth;ic.style.animation='wiggle 0.3s ease';bukaScreenPengumuman()">
+                    <div class="bn-icon" style="width:36px;height:36px;border-radius:12px;background:#f5f3ff;display:flex;align-items:center;justify-content:center">
+                        <i class="fas fa-bullhorn" style="color:#8b5cf6;font-size:1rem"></i>
+                    </div>
+                    <span style="font-size:0.6rem;font-weight:600;color:#94a3b8">Pengumuman</span>
+                </button>
+                <button type="button" class="bn-btn" onclick="var ic=this.querySelector('.bn-icon');ic.style.animation='none';void ic.offsetWidth;ic.style.animation='wiggle 0.3s ease';if(confirm('Keluar dari sistem?')){ localStorage.removeItem('spmb_session'); changeScreen('screenLogin'); document.getElementById('inputKode').value=''; }">
+                    <div class="bn-icon" style="width:36px;height:36px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center">
+                        <i class="fas fa-sign-out-alt" style="color:#94a3b8;font-size:1rem"></i>
+                    </div>
+                    <span style="font-size:0.6rem;font-weight:600;color:#94a3b8">Keluar</span>
+                </button>
+            </div>
+        </div>
+    </div><!-- /screenHome -->
+
+    <!-- SCREEN PENGUMUMAN (PREMIUM FULL SCREEN) -->
+    <div id="screenPengumuman" class="screen" style="display:flex; flex-direction:column; overflow:hidden;">
+        
+        <!-- Area Hasil Pengumuman (Full Height) -->
+        <div id="pgm-body" style="flex:1; display:flex; flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f8fafc;">
+                <div style="font-size:0.9rem; font-weight:700; color:#475569;">Memuat data...</div>
+            </div>
+        </div>
+
+    </div><!-- /screenPengumuman -->
+
+    <!-- TAMBAHAN JADWAL: SCREEN JADWAL (VERTICAL SMART TIMELINE) -->
+    <div id="screenJadwal" class="screen" style="display:flex; flex-direction:column; overflow:hidden; background-color: #f8fafc;">
+        <div class="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-slate-200 z-50 px-5 py-4 shadow-sm flex justify-between items-center">
+            <h4 class="text-sm font-black text-slate-800 tracking-tight">Jadwal SPMB</h4>
+            <button onclick="changeScreen('screenHome')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 text-xs active:bg-slate-200"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div id="jadwalScrollArea" style="flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 30px; -webkit-overflow-scrolling: touch;">
+            <div id="jadwal-container" class="max-w-md mx-auto relative">
+                <!-- Data Jadwal dimuat via JS -->
+            </div>
+        </div>
+    </div><!-- /screenJadwal -->
+
+    <!-- INJEKSI INFORMASI - HTML SCREEN -->
+    <!-- ======================================================= -->
+    <div id="screenInformasi" class="screen bg-slate-50 relative">
+        <!-- Sticky Header & Tab Menu -->
+        <div class="sticky top-0 bg-white/95 backdrop-blur-xl border-b border-slate-200 z-50 shadow-sm">
+            <div class="px-5 py-4 flex justify-between items-center">
+                <div>
+                    <h4 class="text-sm font-black text-slate-800 tracking-tight">Persyaratan SPMB</h4>
+                    <p class="text-[10px] font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded inline-block mt-1">Tahun Ajaran 2026/2027</p> <!-- REVISI: Teks Tahun Ajaran -->
+                </div>
+                <button onclick="changeScreen('screenHome')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 text-xs active:bg-slate-200 transition-colors"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <!-- Tab Navigasi -->
+            <!-- REVISI: Tab dipatenkan agar muat 1 layar tanpa scroll (flex & justify-between) -->
+            <div class="info-tab-wrapper border-t border-slate-100">
+                <button id="tab-info-UM" onclick="switchInfoTab('UM')" class="info-tab-btn text-blue-600 border-blue-600 font-black">Umum</button>
+                <button id="tab-info-DOMISILI" onclick="switchInfoTab('DOMISILI')" class="info-tab-btn text-slate-400 font-semibold">Domisili</button>
+                <button id="tab-info-PRESTASI" onclick="switchInfoTab('PRESTASI')" class="info-tab-btn text-slate-400 font-semibold">Prestasi</button>
+                <button id="tab-info-AFIRMASI" onclick="switchInfoTab('AFIRMASI')" class="info-tab-btn text-slate-400 font-semibold">Afirmasi</button>
+                <button id="tab-info-MUTASI" onclick="switchInfoTab('MUTASI')" class="info-tab-btn text-slate-400 font-semibold">Mutasi</button>
+            </div>
+        </div>
+
+        <!-- Area List Data -->
+        <div id="info-list-container" class="p-4 pb-32">
+            <!-- Data akan di-render di sini oleh JS -->
+        </div>
+    </div>
+    <!-- ======================================================= -->
+    
+    <!-- DAFTAR SCREEN (MULTI-STEP) -->
+    <div id="screenDaftar" class="screen relative bg-slate-50">
+        <!-- Modern Header -->
+        <div class="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-slate-200 z-50 px-5 py-4 shadow-sm flex justify-between items-center">
+            <div>
+                <h4 class="text-sm font-black text-slate-800 tracking-tight">Formulir SPMB</h4>
+                <p class="text-[10px] font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded inline-block mt-1">Langkah <span id="stepIndikator">1 dari 3</span></p>
+            </div>
+            <button onclick="changeScreen('screenHome')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 text-xs active:bg-slate-200"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="p-4">
+            <form id="formBiodata" onsubmit="event.preventDefault(); return false;">
+                
+                <!-- STEP 1: DATA DIRI -->
+                <div id="step1" class="step-container active">
+                    <div class="section-badge">
+                        <i class="fas fa-user-graduate text-white/80 text-lg"></i>
+                        <h6 class="font-extrabold text-sm text-white m-0 tracking-wide">DATA DIRI CALON MURID</h6>
+                    </div>
+                    
+                    <div class="card-form">
+                        <div class="mb-3"><label class="form-label">Nama Lengkap (Sesuai Ijazah SD) <span class="required-star">*</span></label><input type="text" name="nama_lengkap" class="form-control req" required></div>
+                        <div class="mb-3"><label class="form-label">NISN <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="nisn" class="form-control req" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                        
+                        <div class="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                            <label class="form-label mb-1">NIK (Nomor Induk Kependudukan) <span class="required-star">*</span></label>
+                            <span class="nik-error mb-2"><i class="fas fa-info-circle"></i> NIK wajib persis 16 digit angka!</span>
+                            <input type="text" inputmode="numeric" maxlength="16" name="nik" class="form-control req nik-field bg-white" required placeholder="Contoh: 73020xxxxxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this);">
+                        </div>
+
+                        <div class="mb-3"><label class="form-label">Nomor Formulir <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="nomor_formulir" class="form-control req" required placeholder="Contoh: 001" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6"><label class="form-label">Jenis Kelamin <span class="required-star">*</span></label>
+                                <select name="jenis_kelamin" class="form-select req" required><option value="">-- Pilih --</option><option value="L">Laki-laki</option><option value="P">Perempuan</option></select>
+                            </div>
+                            <div class="col-6"><label class="form-label">Agama <span class="required-star">*</span></label>
+                                <select name="agama" class="form-select req" required><option value="">-- Pilih --</option><option value="Islam">Islam</option><option value="Kristen">Kristen</option><option value="Khatolik">Khatolik</option><option value="Hindu">Hindu</option><option value="Buddha">Buddha</option><option value="Konghucu">Konghucu</option><option value="Ateis">Ateis</option><option value="Lainnya">Lainnya</option></select>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-2 mb-3">
+                            <div class="col-7"><label class="form-label">Tempat Lahir <span class="required-star">*</span></label><input type="text" name="tempat_lahir" class="form-control req" required></div>
+                            <div class="col-5"><label class="form-label">Tgl Lahir <span class="required-star">*</span></label><input type="date" name="tanggal_lahir" class="form-control req" required></div>
+                        </div>
+                        
+                        <div class="mb-3"><label class="form-label">Alamat Rumah (Sesuai KK) <span class="required-star">*</span></label><textarea name="alamat_rumah" class="form-control req" required rows="2" placeholder="Nama Jalan / Kampung..."></textarea></div>
+                        
+                        <div class="row g-2 mb-3">
+                            <div class="col-6"><label class="form-label">Dusun/Lingk. <span class="required-star">*</span></label><input type="text" name="dusun" class="form-control req" required></div>
+                            <div class="col-6"><label class="form-label">Desa/Kelur. <span class="required-star">*</span></label><input type="text" name="desa_kelurahan" class="form-control req" required></div>
+                        </div>
+                        
+                        <div class="mb-3"><label class="form-label">Kecamatan <span class="required-star">*</span></label><input type="text" name="kecamatan" class="form-control req" required placeholder="Contoh: Ujung Bulu"></div>
+                        
+                        <div class="row g-2 mb-3">
+                            <div class="col-6"><label class="form-label">Kabupaten <span class="required-star">*</span></label><input type="text" name="kabupaten" class="form-control req" required placeholder="Contoh: Bulukumba"></div>
+                            <div class="col-6"><label class="form-label">Provinsi <span class="required-star">*</span></label><input type="text" name="provinsi" class="form-control req" required placeholder="Sulawesi Selatan"></div>
+                        </div>
+                        
+                        <div class="row g-2 mb-3">
+                            <div class="col-5"><label class="form-label">Kode Pos <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="kode_pos" class="form-control req" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                            <div class="col-7"><label class="form-label">Titik Koordinat (Ops)</label><input type="text" name="titik_koordinat" class="form-control" placeholder="-5.xxx, 120.xxx"></div>
+                        </div>
+
+                        <div class="mb-3"><label class="form-label">Tinggal Bersama <span class="required-star">*</span></label>
+                            <select name="tinggal_bersama" id="selTinggal" class="form-select req" required onchange="cekWali()">
+                                <option value="">-- Pilih --</option><option value="Orang Tua">Orang Tua</option><option value="Wali">Wali</option><option value="Kost">Kost</option><option value="Asrama">Asrama</option><option value="Panti Asuhan">Panti Asuhan</option><option value="Lain-lain">Lain-lain</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3"><label class="form-label">Transportasi ke Sekolah <span class="required-star">*</span></label>
+                            <select name="transportasi" id="selTransportasi" class="form-select req" required onchange="updateTransportLabel()">
+                                <option value="">-- Pilih --</option><option value="Mobil Pribadi">Mobil Pribadi</option><option value="Motor">Motor</option><option value="Sepeda">Sepeda</option><option value="Jalan Kaki">Jalan Kaki</option><option value="Angkutan Umum">Angkutan Umum</option><option value="Bus Sekolah">Bus Sekolah</option><option value="Ojek">Ojek</option><option value="Becak">Becak</option>
+                            </select>
+                        </div>
+
+                        <div class="row g-2 mb-2">
+                            <div class="col-5"><label class="form-label">Anak Ke <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="anak_ke" class="form-control req" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                            <div class="col-7"><label class="form-label">Layak Diusulkan PIP? <span class="required-star">*</span></label>
+                                <select name="kelayakan_pip" class="form-select req" required><option value="">-- Pilih --</option><option value="Ya">Ya</option><option value="Tidak">Tidak</option></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="nextStep(1)" class="btn-modern w-full bg-blue-600 text-white shadow-lg shadow-blue-500/30 active:scale-95">LANJUTKAN <i class="fas fa-chevron-right ml-1"></i></button>
+                    <div id="errStep1" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Mohon lengkapi isian kosong & pastikan NIK 16 digit.</div>
+                </div>
+
+                <!-- STEP 2: DATA ORANG TUA -->
+                <div id="step2" class="step-container">
+                    <div class="section-badge bg-gradient-to-r from-teal-500 to-emerald-600 shadow-emerald-500/40">
+                        <i class="fas fa-users text-white/80 text-lg"></i>
+                        <h6 class="font-extrabold text-sm text-white m-0 tracking-wide">DATA ORANG TUA / WALI</h6>
+                    </div>
+                    
+                    <div class="card-form">
+                        <!-- AYAH -->
+                        <div class="mb-5">
+                            <h6 class="text-xs font-black text-slate-800 mb-3 uppercase tracking-wider"><i class="fas fa-male text-blue-500 mr-1 text-base"></i> Data Ayah</h6>
+                            <div class="mb-2"><label class="form-label">Nama Ayah <span class="required-star">*</span></label><input type="text" name="nama_ayah" class="form-control req step2-req" required></div>
+                            <div class="mb-2"><label class="form-label">Status <span class="required-star">*</span></label>
+                                <select name="status_ayah" id="statAyah" class="form-select req step2-req" required onchange="cekStatusOrangTua('statAyah', 'nikAyah')"><option value="Masih Hidup">Masih Hidup</option><option value="Meninggal">Meninggal</option></select>
+                            </div>
+                            <div class="mb-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                                <label class="form-label mb-1">NIK Ayah <span class="required-star" id="reqNikAyah">*</span></label>
+                                <span class="nik-error mb-2">Harus 16 Digit!</span>
+                                <input type="text" inputmode="numeric" maxlength="16" name="nik_ayah" id="nikAyah" class="form-control req step2-req nik-field bg-white" required oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this);">
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-7"><label class="form-label">Tmp Lahir <span class="required-star">*</span></label><input type="text" name="tempat_lahir_ayah" class="form-control req step2-req" required></div>
+                                <div class="col-5"><label class="form-label">Tgl Lahir <span class="required-star">*</span></label><input type="date" name="tanggal_lahir_ayah" class="form-control req step2-req" required></div>
+                            </div>
+                            <div class="mb-2"><label class="form-label">Pendidikan <span class="required-star">*</span></label>
+                                <select name="pendidikan_ayah" class="form-select req step2-req" required><option value="">-- Pilih --</option><option value="S3">S3</option><option value="S2">S2</option><option value="S1">S1</option><option value="D3">D3</option><option value="D2">D2</option><option value="D1">D1</option><option value="SMA">SMA/Sederajat</option><option value="SMP">SMP/Sederajat</option><option value="SD">SD/Sederajat</option><option value="Tidak Sekolah">Tidak Sekolah</option></select>
+                            </div>
+                            <div class="mb-2"><label class="form-label">Pekerjaan <span class="required-star">*</span></label>
+                                <select name="pekerjaan_ayah" class="form-select req step2-req" required><option value="">-- Pilih --</option><option value="PNS">PNS</option><option value="TNI">TNI</option><option value="Polri">Polri</option><option value="Nelayan">Nelayan</option><option value="Petani">Petani</option><option value="Buruh">Buruh</option><option value="TKI">TKI</option><option value="Pedagang Kecil">Pedagang Kecil</option><option value="Pedagang Besar">Pedagang Besar</option><option value="Karyawan Swasta">Karyawan Swasta</option><option value="Wirausaha">Wirausaha</option><option value="Pensiun">Pensiun</option><option value="Lainnya">Lainnya</option><option value="Tidak Bekerja">Tidak Bekerja</option><option value="Sudah Meninggal">Sudah Meninggal</option></select>
+                            </div>
+                            <div class="mb-1"><label class="form-label">Penghasilan <span class="required-star">*</span></label>
+                                <select name="penghasilan_ayah" class="form-select req step2-req" required><option value="">-- Pilih --</option><option value="Tidak Ada">Tidak Ada</option><option value="100 rb - 499 rb">100 rb - 499 rb</option><option value="500 rb - 999 rb">500 rb - 999 rb</option><option value="1 jt - 1,9 jt">1 jt - 1,9 jt</option><option value="2 jt - 4,9 jt">2 jt - 4,9 jt</option><option value="5 jt - 20 jt">5 jt - 20 jt</option></select>
+                            </div>
+                        </div>
+                        
+                        <hr class="border-dashed border-slate-300 mb-5">
+
+                        <!-- IBU -->
+                        <div class="mb-5">
+                            <h6 class="text-xs font-black text-slate-800 mb-3 uppercase tracking-wider"><i class="fas fa-female text-pink-500 mr-1 text-base"></i> Data Ibu</h6>
+                            <div class="mb-2"><label class="form-label">Nama Ibu <span class="required-star">*</span></label><input type="text" name="nama_ibu" class="form-control req step2-req" required></div>
+                            <div class="mb-2"><label class="form-label">Status <span class="required-star">*</span></label>
+                                <select name="status_ibu" id="statIbu" class="form-select req step2-req" required onchange="cekStatusOrangTua('statIbu', 'nikIbu')"><option value="Masih Hidup">Masih Hidup</option><option value="Meninggal">Meninggal</option></select>
+                            </div>
+                            <div class="mb-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                                <label class="form-label mb-1">NIK Ibu <span class="required-star" id="reqNikIbu">*</span></label>
+                                <span class="nik-error mb-2">Harus 16 Digit!</span>
+                                <input type="text" inputmode="numeric" maxlength="16" name="nik_ibu" id="nikIbu" class="form-control req step2-req nik-field bg-white" required oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this);">
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-7"><label class="form-label">Tmp Lahir <span class="required-star">*</span></label><input type="text" name="tempat_lahir_ibu" class="form-control req step2-req" required></div>
+                                <div class="col-5"><label class="form-label">Tgl Lahir <span class="required-star">*</span></label><input type="date" name="tanggal_lahir_ibu" class="form-control req step2-req" required></div>
+                            </div>
+                            <div class="mb-2"><label class="form-label">Pendidikan <span class="required-star">*</span></label>
+                                <select name="pendidikan_ibu" class="form-select req step2-req" required><option value="">-- Pilih --</option><option value="S3">S3</option><option value="S2">S2</option><option value="S1">S1</option><option value="D3">D3</option><option value="D2">D2</option><option value="D1">D1</option><option value="SMA">SMA/Sederajat</option><option value="SMP">SMP/Sederajat</option><option value="SD">SD/Sederajat</option><option value="Tidak Sekolah">Tidak Sekolah</option></select>
+                            </div>
+                            <div class="mb-2"><label class="form-label">Pekerjaan <span class="required-star">*</span></label>
+                                <select name="pekerjaan_ibu" class="form-select req step2-req" required><option value="">-- Pilih --</option><option value="PNS">PNS</option><option value="TNI">TNI</option><option value="Polri">Polri</option><option value="Nelayan">Nelayan</option><option value="Petani">Petani</option><option value="Buruh">Buruh</option><option value="TKI">TKI</option><option value="Pedagang Kecil">Pedagang Kecil</option><option value="Pedagang Besar">Pedagang Besar</option><option value="Karyawan Swasta">Karyawan Swasta</option><option value="Wirausaha">Wirausaha</option><option value="Pensiun">Pensiun</option><option value="Lainnya">Lainnya</option><option value="Tidak Bekerja">Tidak Bekerja</option><option value="Sudah Meninggal">Sudah Meninggal</option></select>
+                            </div>
+                            <div class="mb-1"><label class="form-label">Penghasilan <span class="required-star">*</span></label>
+                                <select name="penghasilan_ibu" class="form-select req step2-req" required><option value="">-- Pilih --</option><option value="Tidak Ada">Tidak Ada</option><option value="100 rb - 499 rb">100 rb - 499 rb</option><option value="500 rb - 999 rb">500 rb - 999 rb</option><option value="1 jt - 1,9 jt">1 jt - 1,9 jt</option><option value="2 jt - 4,9 jt">2 jt - 4,9 jt</option><option value="5 jt - 20 jt">5 jt - 20 jt</option></select>
+                            </div>
+                        </div>
+
+                        <hr class="border-dashed border-slate-300 mb-5">
+
+                        <!-- WALI -->
+                        <div id="boxWali" class="disabled-section">
+                            <div class="flex justify-between items-center mb-3">
+                                <h6 class="text-xs font-black text-slate-800 uppercase tracking-wider m-0"><i class="fas fa-user-shield text-slate-500 mr-1 text-base"></i> Data Wali</h6>
+                                <span class="text-[9px] bg-slate-100 text-slate-500 px-2 py-1 rounded border border-slate-200 font-bold">Wajib jika tinggal dgn Wali</span>
+                            </div>
+                            <div class="mb-2"><label class="form-label">Nama Wali</label><input type="text" name="nama_wali" class="form-control val-wali step2-req"></div>
+                            <div class="mb-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                                <label class="form-label mb-1">NIK Wali</label>
+                                <span class="nik-error mb-2">Harus 16 Digit!</span>
+                                <input type="text" inputmode="numeric" maxlength="16" name="nik_wali" class="form-control val-wali step2-req nik-field bg-white" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this);">
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-7"><label class="form-label">Tmp Lahir</label><input type="text" name="tempat_lahir_wali" class="form-control val-wali step2-req"></div>
+                                <div class="col-5"><label class="form-label">Tgl Lahir</label><input type="date" name="tanggal_lahir_wali" class="form-control val-wali step2-req"></div>
+                            </div>
+                            <div class="mb-2"><label class="form-label">Pendidikan</label>
+                                <select name="pendidikan_wali" class="form-select val-wali step2-req"><option value="">-- Pilih --</option><option value="S3">S3</option><option value="S2">S2</option><option value="S1">S1</option><option value="D3">D3</option><option value="D2">D2</option><option value="D1">D1</option><option value="SMA">SMA/Sederajat</option><option value="SMP">SMP/Sederajat</option><option value="SD">SD/Sederajat</option><option value="Tidak Sekolah">Tidak Sekolah</option></select>
+                            </div>
+                            <div class="mb-2"><label class="form-label">Pekerjaan</label>
+                                <select name="pekerjaan_wali" class="form-select val-wali step2-req"><option value="">-- Pilih --</option><option value="PNS">PNS</option><option value="TNI">TNI</option><option value="Polri">Polri</option><option value="Nelayan">Nelayan</option><option value="Petani">Petani</option><option value="Buruh">Buruh</option><option value="TKI">TKI</option><option value="Pedagang Kecil">Pedagang Kecil</option><option value="Pedagang Besar">Pedagang Besar</option><option value="Karyawan Swasta">Karyawan Swasta</option><option value="Wirausaha">Wirausaha</option><option value="Pensiun">Pensiun</option><option value="Lainnya">Lainnya</option><option value="Tidak Bekerja">Tidak Bekerja</option><option value="Sudah Meninggal">Sudah Meninggal</option></select>
+                            </div>
+                            <div class="mb-1"><label class="form-label">Penghasilan</label>
+                                <select name="penghasilan_wali" class="form-select val-wali step2-req"><option value="">-- Pilih --</option><option value="Tidak Ada">Tidak Ada</option><option value="100 rb - 499 rb">100 rb - 499 rb</option><option value="500 rb - 999 rb">500 rb - 999 rb</option><option value="1 jt - 1,9 jt">1 jt - 1,9 jt</option><option value="2 jt - 4,9 jt">2 jt - 4,9 jt</option><option value="5 jt - 20 jt">5 jt - 20 jt</option></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button type="button" onclick="prevStep(2)" class="btn-modern bg-slate-200 text-slate-700 active:scale-95 flex-1">KEMBALI</button>
+                        <button type="button" onclick="nextStep(2)" class="btn-modern bg-blue-600 text-white shadow-lg shadow-blue-500/30 active:scale-95 flex-[2]">LANJUTKAN <i class="fas fa-chevron-right ml-1"></i></button>
+                    </div>
+                    <div id="errStep2" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Lengkapi data Orang Tua/Wali & pastikan NIK 16 digit.</div>
+                </div>
+
+                <!-- STEP 3: DATA PERIODIK -->
+                <div id="step3" class="step-container mb-10">
+                    <div class="section-badge bg-gradient-to-r from-orange-500 to-rose-500 shadow-rose-500/40">
+                        <i class="fas fa-list-check text-white/80 text-lg"></i>
+                        <h6 class="font-extrabold text-sm text-white m-0 tracking-wide">DATA PERIODIK & LAINNYA</h6>
+                    </div>
+                    
+                    <div class="card-form">
+                        <div class="mb-3"><label class="form-label">No HP Orang Tua Aktif <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="no_hp_ortu" class="form-control req step3-req" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                        <div class="mb-3"><label class="form-label">Email Belajar.id (Opsional)</label><input type="email" name="email_belajar_id" class="form-control"></div>
+                        
+                        <div class="row g-2 mb-3">
+                            <div class="col-4"><label class="form-label">Tinggi <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="tinggi_badan" class="form-control req step3-req text-center" required placeholder="cm" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                            <div class="col-4"><label class="form-label">Berat <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="berat_badan" class="form-control req step3-req text-center" required placeholder="kg" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                            <div class="col-4"><label class="form-label">L.Kepala <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="lingkar_kepala" class="form-control req step3-req text-center" required placeholder="cm" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                        </div>
+
+                        <div class="mb-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <label class="form-label">Jarak Rumah ke Sekolah <span class="required-star">*</span></label>
+                            <select name="jarak_kategori" id="selJarak" class="form-select req step3-req mb-2 bg-white" required onchange="cekJarak()">
+                                <option value="">-- Pilih --</option><option value="Kurang dari 1 Km">Kurang dari 1 Km</option><option value="Lebih dari 1 Km">Lebih dari 1 Km</option>
+                            </select>
+                            <div id="boxJarakKm" class="hidden mt-2">
+                                <label class="form-label text-[10px]">Sebutkan Jarak (Km)</label>
+                                <input type="text" inputmode="numeric" name="jarak_km" id="inputJarakKm" class="form-control bg-white" placeholder="Contoh: 5" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                            </div>
+                        </div>
+
+                        <div class="mb-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <label class="form-label">Waktu Tempuh (<span id="lblTransport" class="text-blue-600">Transportasi</span>) <span class="required-star">*</span></label>
+                            <div class="row g-2 mt-2">
+                                <div class="col-6"><input type="text" inputmode="numeric" name="lama_jam" class="form-control req step3-req text-center bg-white" required placeholder="Jam" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                                <div class="col-6"><input type="text" inputmode="numeric" name="lama_menit" class="form-control req step3-req text-center bg-white" required placeholder="Menit" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label mb-0">Jumlah Saudara Kandung <span class="required-star">*</span></label>
+                            <p class="text-[10px] text-red-500 italic mb-2 font-bold tracking-wide">tidak termasuk anda</p>
+                            <input type="text" inputmode="numeric" name="jumlah_saudara" class="form-control req step3-req w-1/3 text-center" required oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label block mb-3">Riwayat Pendidikan Sebelumnya</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200"><span class="text-xs font-bold text-slate-700">PAUD</span><input type="hidden" name="paud" id="val_paud" value="Tidak"><label class="toggle-switch"><input type="checkbox" id="chk_paud" onchange="document.getElementById('val_paud').value = this.checked ? 'Ya' : 'Tidak'"><span class="slider"></span></label></div>
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200"><span class="text-xs font-bold text-slate-700">TK</span><input type="hidden" name="tk" id="val_tk" value="Tidak"><label class="toggle-switch"><input type="checkbox" id="chk_tk" onchange="document.getElementById('val_tk').value = this.checked ? 'Ya' : 'Tidak'"><span class="slider"></span></label></div>
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200"><span class="text-xs font-bold text-slate-700">TPA</span><input type="hidden" name="tpa" id="val_tpa" value="Tidak"><label class="toggle-switch"><input type="checkbox" id="chk_tpa" onchange="document.getElementById('val_tpa').value = this.checked ? 'Ya' : 'Tidak'"><span class="slider"></span></label></div>
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200"><span class="text-xs font-bold text-slate-700">KB</span><input type="hidden" name="kb" id="val_kb" value="Tidak"><label class="toggle-switch"><input type="checkbox" id="chk_kb" onchange="document.getElementById('val_kb').value = this.checked ? 'Ya' : 'Tidak'"><span class="slider"></span></label></div>
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200 col-span-2"><span class="text-xs font-bold text-slate-700">SPS</span><input type="hidden" name="sps" id="val_sps" value="Tidak"><label class="toggle-switch"><input type="checkbox" id="chk_sps" onchange="document.getElementById('val_sps').value = this.checked ? 'Ya' : 'Tidak'"><span class="slider"></span></label></div>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6"><label class="form-label">Hobi <span class="required-star">*</span></label><input type="text" name="hobi" class="form-control req step3-req" required></div>
+                            <div class="col-6"><label class="form-label">Cita-cita <span class="required-star">*</span></label><input type="text" name="cita_cita" class="form-control req step3-req" required></div>
+                        </div>
+                        <div class="mb-4"><label class="form-label">Asal Sekolah Jenjang Sebelumnya <span class="required-star">*</span></label><input type="text" name="asal_sekolah" class="form-control req step3-req" required></div>
+                        
+                        <div class="mb-2 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                            <label class="form-label text-blue-700 font-extrabold text-xs mb-2">Jalur Pendaftaran <span class="required-star">*</span></label>
+                            <select name="jalur_pendaftaran" class="form-select req step3-req font-bold text-blue-800 bg-white" required><option value="">-- Pilih Jalur --</option><option value="Domisili">Domisili</option><option value="Prestasi">Prestasi</option><option value="Afirmasi">Afirmasi</option><option value="Mutasi">Mutasi</option></select>
+                        </div>
+                    </div>
+
+                    <!-- AREA SUBMIT FINAL -->
+                    <div class="mt-8 text-center px-2">
+                        <label class="flex items-center justify-center gap-3 mb-5 cursor-pointer bg-slate-100 p-4 rounded-2xl border border-slate-200">
+                            <input type="checkbox" id="checkSiap" class="w-5 h-5 rounded text-blue-600" onchange="cekSubmitFinal()">
+                            <span class="text-xs font-black text-slate-700 uppercase tracking-tight">Saya menyatakan data ini valid & benar.</span>
+                        </label>
+                        <div class="flex gap-3">
+                            <button type="button" onclick="prevStep(3)" class="btn-modern bg-slate-200 text-slate-700 active:scale-95 flex-[1]">KEMBALI</button>
+                            <button type="button" id="btnPreview" disabled onclick="kirimFinal()" class="btn-modern bg-slate-200 text-slate-400 cursor-not-allowed flex-[2] transition-all duration-300">
+                                <i class="fas fa-paper-plane"></i> KIRIM
+                            </button>
+                        </div>
+                        <div id="errStep3" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Mohon lengkapi semua isian di atas!</div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // MASUKKAN URL DEPLOY WEB APP GAS ANDA DI SINI
+    const API_URL = "https://script.google.com/macros/s/AKfycbyEufeBCjzYi7sm1AMt7Hcoj5oJ-2fjYl9_4lbKSx_l84U0oyH7LKX7pBt1lUmwMRNY/exec"; // <-- GANTI INI!!
+
+    // FUNGSI KOMUNIKASI API (Pengganti google.script.run)
+    function fetchApi(action, payload, onSuccess, onFailure) {
+        fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: action, payload: payload })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(resData) {
+            if (resData.error && onFailure) onFailure({ message: resData.error });
+            else if (onSuccess) onSuccess(resData.data);
+        })
+        .catch(function(err) {
+            if (onFailure) onFailure(err);
+            console.error("Fetch Error:", err);
+        });
+    }
+
+    var CONFIG = { kode_otorisasi: "" };
+    var pgmTimer = null; 
+
+    window.onload = function() { 
+        initRealtimeValidation(); 
+        
+        fetchApi('getLinkUrl', null, function(url) {
+            if(url) document.getElementById('screenLogin').style.backgroundImage = "url('" + url + "')";
+        }); 
+
+        var savedSession = localStorage.getItem('spmb_session');
+        if (savedSession) {
+            var sessionData = JSON.parse(savedSession);
+            document.getElementById('inputKode').value = sessionData.kode;
+            prosesLogin(true); 
+        }
+    };
+
+    function changeScreen(id) {
+        var screens = document.getElementsByClassName('screen');
+        for (var i = 0; i < screens.length; i++) {
+            screens[i].classList.remove('active');
+            screens[i].style.setProperty("display", "none", "important");
+        }
+        var targetScreen = document.getElementById(id);
+        targetScreen.classList.add('active');
+        targetScreen.style.setProperty("display", "flex", "important");
+        targetScreen.scrollTop = 0;
+    }
+
+    function showLoader(show, text) {
+        if (!text) text = "Memproses...";
+        var loader = document.getElementById('loader');
+        if (show) { loader.classList.remove('hidden'); loader.style.display = "flex"; } 
+        else { loader.classList.add('hidden'); loader.style.display = "none"; }
+        document.getElementById('loaderText').innerText = text;
+    }
+
+    function showToast(msg) {
+        var toast = document.getElementById('toast');
+        toast.innerHTML = '<i class="fas fa-cloud-upload-alt text-blue-400 mr-2"></i> ' + msg;
+        toast.classList.add('show');
+        setTimeout(function(){ toast.classList.remove('show'); }, 2500);
+    }
+
+    function showError(msg) {
+        var box = document.getElementById('errorBox');
+        box.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg;
+        box.classList.remove('hidden');
+    }
+
+    function nextStep(currentStep) {
+        if(!validateStep(currentStep)) {
+            document.getElementById('errStep'+currentStep).classList.remove('hidden');
+            return;
+        }
+        document.getElementById('errStep'+currentStep).classList.add('hidden');
+        document.getElementById('step'+currentStep).classList.remove('active');
+        var next = currentStep + 1;
+        document.getElementById('step'+next).classList.add('active');
+        document.getElementById('stepIndikator').innerText = next + " dari 3";
+        document.getElementById('screenDaftar').scrollTop = 0;
+        showToast("Menyimpan draft otomatis...");
+        simpanDraftBackground();
+    }
+
+    function prevStep(currentStep) {
+        document.getElementById('step'+currentStep).classList.remove('active');
+        var prev = currentStep - 1;
+        document.getElementById('step'+prev).classList.add('active');
+        document.getElementById('stepIndikator').innerText = prev + " dari 3";
+        document.getElementById('screenDaftar').scrollTop = 0;
+    }
+
+    function cekWali() {
+        var sel = document.getElementById('selTinggal').value;
+        var box = document.getElementById('boxWali');
+        var inputs = box.getElementsByClassName('val-wali');
+        if(sel === 'Wali') {
+            box.classList.remove('disabled-section');
+            for(var i=0; i<inputs.length; i++) { inputs[i].classList.add('req'); inputs[i].setAttribute('required', 'true'); }
+        } else {
+            box.classList.add('disabled-section');
+            for(var i=0; i<inputs.length; i++) { inputs[i].classList.remove('req', 'input-filled', 'invalid-nik'); inputs[i].removeAttribute('required'); inputs[i].value = ""; checkNik(inputs[i]); }
+        }
+    }
+
+    function cekStatusOrangTua(idStatus, idNik) {
+        var status = document.getElementById(idStatus).value;
+        var inputNik = document.getElementById(idNik);
+        var labelReq = document.getElementById(idNik === 'reqNikAyah' ? 'reqNikAyah' : 'reqNikIbu');
+        if(status === 'Meninggal') {
+            inputNik.removeAttribute('required'); inputNik.classList.remove('req', 'invalid-nik');
+            if(labelReq) labelReq.style.display = 'none';
+        } else {
+            inputNik.setAttribute('required', 'true'); inputNik.classList.add('req');
+            if(labelReq) labelReq.style.display = 'inline';
+        }
+        checkNik(inputNik);
+    }
+
+    function cekJarak() {
+        var sel = document.getElementById('selJarak').value;
+        var box = document.getElementById('boxJarakKm');
+        var input = document.getElementById('inputJarakKm');
+        if(sel === 'Lebih dari 1 Km') {
+            box.classList.remove('hidden'); input.classList.add('req'); input.setAttribute('required', 'true');
+        } else {
+            box.classList.add('hidden'); input.classList.remove('req', 'input-filled'); input.removeAttribute('required'); input.value = "";
+        }
+    }
+
+    function updateTransportLabel() {
+        var val = document.getElementById('selTransportasi').value;
+        document.getElementById('lblTransport').innerText = val ? val : "Transportasi";
+    }
+
+    function checkNik(el) {
+        if(!el) return;
+        var errBox = el.parentElement.querySelector('.nik-error');
+        var val = el.value.trim();
+        var isRequired = el.hasAttribute('required');
+        if(val.length > 0) {
+            if(val.length === 16) {
+                el.classList.add('input-filled'); el.classList.remove('invalid-nik');
+                if(errBox) errBox.classList.remove('show');
+                return true;
+            } else {
+                el.classList.remove('input-filled'); el.classList.add('invalid-nik');
+                if(errBox) errBox.classList.add('show');
+                return false;
+            }
+        } else {
+            if(isRequired) {
+                el.classList.remove('input-filled'); el.classList.remove('invalid-nik');
+                if(errBox) errBox.classList.remove('show');
+                return false;
+            } else {
+                el.classList.remove('input-filled', 'invalid-nik');
+                if(errBox) errBox.classList.remove('show');
+                return true; 
+            }
+        }
+    }
+
+    function initRealtimeValidation() {
+        document.getElementById('formBiodata').addEventListener('input', function(e) {
+            if(e.target.classList.contains('req')) {
+                if(!e.target.classList.contains('nik-field')) {
+                    if(e.target.value) e.target.classList.add('input-filled');
+                    else e.target.classList.remove('input-filled');
+                }
+            }
+            if(document.getElementById('checkSiap').checked) cekSubmitFinal(); 
+        });
+        document.getElementById('formBiodata').addEventListener('change', function(e) {
+            if(document.getElementById('checkSiap').checked) cekSubmitFinal();
+        });
+    }
+
+    function validateStep(stepNum) {
+        var container = document.getElementById('step'+stepNum);
+        var reqs = container.querySelectorAll('[required]');
+        var isValid = true;
+        for (var j = 0; j < reqs.length; j++) { if(!reqs[j].value) isValid = false; }
+        var niks = container.querySelectorAll('.nik-field');
+        for (var k = 0; k < niks.length; k++) { if(!checkNik(niks[k])) isValid = false; }
+        return isValid;
+    }
+
+    function cekSubmitFinal() {
+        var btn = document.getElementById('btnPreview');
+        var check = document.getElementById('checkSiap');
+        var isStep3Valid = validateStep(3);
+        if(!isStep3Valid) {
+            check.checked = false;
+            document.getElementById('errStep3').classList.remove('hidden');
+            btn.className = "btn-modern bg-slate-200 text-slate-400 cursor-not-allowed flex-[2] transition-all duration-300";
+            btn.disabled = true;
+            return;
+        }
+        document.getElementById('errStep3').classList.add('hidden');
+        if(check.checked) {
+            btn.disabled = false;
+            btn.className = "btn-modern bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/40 active:scale-95 flex-[2] transition-all duration-300";
+        } else {
+            btn.disabled = true;
+            btn.className = "btn-modern bg-slate-200 text-slate-400 cursor-not-allowed flex-[2] transition-all duration-300";
+        }
+    }
+
+    function populateForm(data) {
+        var form = document.getElementById('formBiodata');
+        var elements = form.elements;
+        for (var i = 0; i < elements.length; i++) {
+            var el = elements[i];
+            if(el.name && data[el.name] && data[el.name] !== "-" && data[el.name] !== "") {
+                el.value = data[el.name];
+                if(el.name === 'tinggal_bersama') cekWali();
+                if(el.name === 'status_ayah') cekStatusOrangTua('statAyah', 'nikAyah');
+                if(el.name === 'status_ibu') cekStatusOrangTua('statIbu', 'nikIbu');
+                if(el.name === 'jarak_kategori') cekJarak();
+                if(el.name === 'transportasi') updateTransportLabel();
+                if(el.classList.contains('nik-field')) checkNik(el);
+                else if(el.value) el.classList.add('input-filled');
+            }
+        }
+        var riwayat = ['paud', 'tk', 'tpa', 'kb', 'sps'];
+        for(var r=0; r<riwayat.length; r++) {
+            if(data[riwayat[r]] === 'Ya') {
+                var chk = document.getElementById('chk_'+riwayat[r]);
+                if(chk) chk.checked = true;
+                document.getElementById('val_'+riwayat[r]).value = 'Ya';
+            }
+        }
+    }
+
+    function toProperCase(str) {
+        if (!str) return str;
+        return str.toLowerCase().split(' ').map(function(word) {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        }).join(' ');
+    }
+
+    function prosesLogin(isAutoLogin) {
+        if (!isAutoLogin) document.getElementById('inputKode').blur();
+        var kodeInput = document.getElementById('inputKode').value;
+        var kode = kodeInput ? kodeInput.trim() : "";
+        if(!kode) return;
+        
+        showLoader(true, isAutoLogin ? "Memuat data..." : "Verifikasi Akses...");
+        document.getElementById('errorBox').classList.add('hidden');
+
+        fetchApi('validasiKode', kode, function(resString) {
+            showLoader(false);
+            var response = JSON.parse(resString);
+
+            if(response.status === "SUCCESS") {
+                CONFIG.kode_otorisasi = kode;
+                var _nama = response.data ? (response.data.nama_lengkap || '').trim() : '';
+                localStorage.setItem('spmb_session', JSON.stringify({ kode: kode, nama: _nama }));
+
+                var el = document.getElementById('displayKodeUser');
+                el.textContent = _nama ? toProperCase(_nama) : kode;
+                el.style.textTransform = _nama ? 'none' : 'uppercase';
+                CONFIG.status_isian = (response.status_isian || '').toLowerCase();
+                
+                if(response.data) populateForm(response.data);
+                
+                var draftBox = document.getElementById('infoDraft');
+                if (draftBox) {
+                    draftBox.style.display = 'flex';
+                    const dataObj = response.data || {};
+                    const fieldTerisi = Object.keys(dataObj).filter(k => k !== 'kode_otorisasi' && k !== 'status_isian' && dataObj[k] && dataObj[k].toString().trim() !== '').length;
+                    const lblStatus = document.getElementById('lblStatusDraft');
+                    const titleStatus = lblStatus.previousElementSibling; 
+                    const iconDraft = document.querySelector('#infoDraft i');
+
+                    if (CONFIG.status_isian === 'selesai') {
+                        titleStatus.textContent = 'Data Terkunci';
+                        lblStatus.textContent = 'Anda telah melakukan finalisasi. Data telah terkirim dan idak dapat diubah lagi.';
+                        draftBox.style.backgroundColor = '#fef2f2'; draftBox.style.borderColor = '#dc2626';
+                        titleStatus.style.color = '#b91c1c'; lblStatus.style.color = '#b91c1c';
+                        iconDraft.style.color = '#dc2626'; iconDraft.className = 'fas fa-lock';
+                    } else if (fieldTerisi === 0) {
+                        titleStatus.textContent = 'Pendaftaran Dimulai';
+                        lblStatus.textContent = 'Silahkan pilih menu Lengkapi Biodata';
+                        draftBox.style.backgroundColor = '#dcfce7'; draftBox.style.borderColor = '#16a34a';
+                        titleStatus.style.color = '#15803d'; lblStatus.style.color = '#15803d';
+                        iconDraft.style.color = '#16a34a'; iconDraft.className = 'fas fa-pencil-alt';
+                    } else {
+                        titleStatus.textContent = 'Draft Tersimpan';
+                        lblStatus.textContent = 'Lanjutkan pengisian formulir Anda';
+                        draftBox.style.backgroundColor = '#fff7ed'; draftBox.style.borderColor = '#fed7aa';
+                        titleStatus.style.color = '#c2410c'; lblStatus.style.color = '#9a3412';
+                        iconDraft.style.color = '#f97316'; iconDraft.className = 'fas fa-clock';
+                    }
+                }
+                setTimeout(function() { changeScreen('screenHome'); }, 100);
+            } else if(response.status === "NOT_FOUND") {
+                if (isAutoLogin) localStorage.removeItem('spmb_session');
+                showError("Kode pendaftaran tidak valid!");
+            } else {
+                if (isAutoLogin) localStorage.removeItem('spmb_session');
+                showError(response.msg);
+            }
+        }, function(err) {
+            showLoader(false); showError("Koneksi internet terputus.");
+        });
+    }
+
+    function bukaDaftar() {
+        if (CONFIG.status_isian === 'selesai') changeScreen('screenLocked');
+        else changeScreen('screenDaftar');
+    }
+
+    function pgmEsc(str) { return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function bukaScreenPengumuman() {
+        changeScreen('screenPengumuman');
+        var bottomNavPgm = document.querySelector('#screenPengumuman .bottom-nav-layout');
+        if (bottomNavPgm) bottomNavPgm.style.display = 'none';
+        muatPengumuman();
+    }
+
+    function muatPengumuman() {
+        var body = document.getElementById('pgm-body');
+        if(pgmTimer) clearInterval(pgmTimer);
+        
+        body.innerHTML = '<div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f8fafc;"><div style="font-size:0.9rem; font-weight:700; color:#475569;">Memuat data...</div></div>';
+        
+        var kode = CONFIG.kode_otorisasi || '';
+        if (!kode) {
+            body.innerHTML = '<div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f8fafc;"><h3 style="font-size:1.2rem; font-weight:800; color:#e11d48;">Sesi Tidak Valid</h3><p style="color:#64748b; margin-top:5px;">Silakan login kembali.</p></div>';
+            return;
+        }
+
+        fetchApi('getPengumuman', kode, renderPengumuman, function() {
+            document.getElementById('pgm-body').innerHTML = '<div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f8fafc;"><h3 style="font-size:1.2rem; font-weight:800; color:#e11d48;">Gagal Memuat Data</h3><p style="color:#64748b; margin-top:5px;">Periksa koneksi internet Anda.</p></div>';
+        });
+    }
+
+    function normalisasiStatus(status) {
+        const bersih = String(status || '').trim().toUpperCase();
+        if (bersih === 'BUKA') return 'buka';
+        return 'tutup';
+    }
+
+    function renderPengumuman(d) {
+        var body = document.getElementById('pgm-body');
+        
+        if (d && d._status_buka) {
+            var statusPgm = normalisasiStatus(d._status_buka);
+            if (statusPgm === 'tutup') {
+                var pesan = pgmEsc(d._pesan || 'Pengumuman belum dibuka.');
+                body.innerHTML = `
+                    <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f8fafc; padding:20px; width:100%;">
+                        <div class="max-w-md mx-auto bg-white rounded-2xl shadow-lg border border-slate-200 p-8 text-center" style="animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); width:100%;">
+                            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            </div>
+                            <h2 class="text-xl font-bold text-slate-800 mb-2">Pengumuman Belum Dibuka</h2>
+                            <p class="text-sm text-slate-600 leading-relaxed mb-6">` + pesan + `</p>
+                            <button onclick="changeScreen('screenHome')" class="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm hover:bg-slate-50 transition mx-auto">
+                                <svg class="h-4 w-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+        }
+
+        if (!d) {
+            body.innerHTML = '<div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 20px; text-align:center; background:#f8fafc;"><i class="fas fa-search" style="font-size:3.5rem;color:#cbd5e1;margin-bottom:15px;"></i><h2 style="font-size:1.4rem;font-weight:800;color:#475569;">Tidak Ditemukan</h2><p style="color:#64748b;margin-top:5px;">Kode formulir Anda belum terdaftar dalam daftar pengumuman.</p><button onclick="changeScreen(\'screenHome\')" class="mt-6 px-6 py-2 rounded-full bg-white border border-slate-200 text-slate-600 text-sm font-semibold shadow-sm hover:bg-slate-50 transition">Kembali ke Beranda</button></div>';
+            return;
+        }
+
+        var count = 5;
+        body.innerHTML = `
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f8fafc;">
+                <div style="width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg, #3b82f6, #1e40af);display:flex;align-items:center;justify-content:center;color:white;font-size:3.5rem;font-weight:900;box-shadow:0 10px 25px rgba(37,99,235,0.4);animation:pulseCount 1s infinite;">
+                    <span id="countdown-num">${count}</span>
+                </div>
+                <h3 style="margin-top:35px;font-size:1.15rem;font-weight:800;color:#334155;">Menyiapkan Hasil Anda...</h3>
+                <p style="font-size:0.85rem;color:#64748b;margin-top:5px;font-weight:500;">Mohon tunggu sejenak</p>
+            </div>
+        `;
+
+        pgmTimer = setInterval(function() {
+            count--;
+            var el = document.getElementById('countdown-num');
+            if(el) el.innerText = count;
+            
+            if(count <= 0) {
+                clearInterval(pgmTimer);
+                tampilkanHasilAkhir(d);
+            }
+        }, 1000);
+    }
+
+    function tampilkanHasilAkhir(d) {
+        var body = document.getElementById('pgm-body');
+        var kep = String(d.keputusan || '').trim().toUpperCase();
+        var ket = pgmEsc(d.keterangan || '');
+        var namaPendaftar = pgmEsc(d.nama_lengkap || 'Calon Murid');
+        
+        var isLulus = false;
+        if (kep.indexOf('LULUS') !== -1 && kep.indexOf('TIDAK') === -1) isLulus = true;
+        if (kep.indexOf('DITERIMA') !== -1 && kep.indexOf('TIDAK') === -1) isLulus = true;
+
+        var textKeteranganLulus = ket ? ket : "Silahkan melakukan pendaftaran ulang pada waktu yang telah ditentukan.";
+        if (isLulus && ket) {
+            textKeteranganLulus += '<br><br><span class="text-blue-700 font-semibold">Catatan:</span> Silahkan melakukan pendaftaran ulang pada waktu yang telah ditentukan.';
+        }
+        var textKeteranganGagal = "Kegagalan hari ini bukan akhir dari segalanya. Setiap usaha yang Anda lakukan tetaplah berharga dan menjadi bekal untuk langkah berikutnya. Tetap semangat, terus belajar, dan percayalah bahwa pintu kesempatan terbaik akan terbuka di waktu yang tepat.";
+
+        var html = '';
+        html += '<div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 20px; background-color: #f8fafc;">';
+        html += '<div class="relative w-full max-w-sm" style="animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);">';
+        html += '<div id="box-keputusan" data-mode="' + (isLulus ? 'accepted' : 'rejected') + '" class="border border-slate-200 rounded-2xl overflow-hidden shadow-lg bg-white pb-6">';
+        html += '<div class="bg-slate-100 px-6 py-4 border-b border-slate-200">';
+        html += '<p class="text-xs font-bold text-slate-600 uppercase tracking-[0.2em] text-center mb-1 m-0">KEPUTUSAN PANITIA SPMB</p>';
+        html += '<p class="text-[10px] font-medium text-slate-500 text-center m-0">SMP Negeri 1 Bulukumba</p>';
+        html += '</div>';
+
+        html += '<div class="px-6 py-8 text-center bg-white relative">';
+        html += '<div class="absolute top-0 left-1/4 right-1/4 h-0.5 bg-amber-500"></div>'; 
+        
+        if (isLulus) {
+            html += '<p class="text-xs font-medium text-slate-500 uppercase tracking-widest mb-1">SELAMAT,</p>';
+            html += '<p class="text-lg font-semibold text-slate-800 mb-3">' + namaPendaftar + '</p>';
+            html += '<p class="text-base font-medium text-slate-600 mb-2">Anda dinyatakan</p>';
+            html += '<p class="text-5xl font-extrabold text-blue-700 tracking-tight m-0">' + (kep || 'DITERIMA') + '</p>';
+        } else {
+            html += '<p class="text-xs font-medium text-slate-500 uppercase tracking-widest mb-1">MOHON MAAF,</p>';
+            html += '<p class="text-lg font-semibold text-slate-800 mb-3">' + namaPendaftar + '</p>';
+            html += '<p class="text-base font-medium text-slate-600 mb-2">Anda dinyatakan</p>';
+            html += '<p class="text-5xl font-extrabold text-rose-700 tracking-tight m-0">' + (kep || 'TIDAK LULUS') + '</p>';
+        }
+        html += '</div>';
+
+        html += '<div class="bg-slate-50 px-6 py-5 border-t border-slate-200">';
+        html += '<p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 text-center m-0">Keterangan</p>';
+        if (isLulus) {
+            html += '<p class="text-sm text-slate-600 leading-relaxed text-justify m-0">' + textKeteranganLulus + '</p>';
+        } else {
+            html += '<p class="text-sm text-slate-600 leading-relaxed text-justify m-0">' + textKeteranganGagal + '</p>';
+        }
+        html += '</div>';
+        html += '</div>'; 
+        
+        html += '<button onclick="changeScreen(\'screenHome\')" class="absolute bottom-4 left-4 w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm hover:bg-slate-50 transition">';
+        html += '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>';
+        html += '</button>';
+
+        html += '</div></div>';
+        body.innerHTML = html;
+    }
+
+    function simpanDraftBackground() {
+        var form = document.getElementById('formBiodata');
+        var fd = new FormData(form);
+        var payload = { kode_otorisasi: CONFIG.kode_otorisasi, status_isian: "Draft" };
+        var entires = fd.entries(); var result = entires.next();
+        while (!result.done) { payload[result.value[0]] = result.value[1]; result = entires.next(); }
+        
+        fetchApi('saveData', payload);
+    }
+
+    function kirimFinal() {
+        if(!confirm("Kirim Permanen? Anda tidak akan bisa mengubah data lagi setelah ini.")) return;
+        showLoader(true, "Finalisasi Data...");
+        var form = document.getElementById('formBiodata');
+        var fd = new FormData(form);
+        var payload = { kode_otorisasi: CONFIG.kode_otorisasi, status_isian: "Selesai" };
+        var entires = fd.entries(); var result = entires.next();
+        while (!result.done) { payload[result.value[0]] = result.value[1]; result = entires.next(); }
+
+        fetchApi('saveData', payload, function(response) {
+            showLoader(false);
+            if(String(response).trim().toUpperCase() === "SUCCESS") {
+                showLoader(true, "Mencetak Bukti Daftar...");
+                fetchApi('generatePDF_F4', CONFIG.kode_otorisasi, function(pdfResponse) {
+                    showLoader(false);
+                    if(pdfResponse && String(pdfResponse).indexOf("ERROR") === 0) {
+                        alert("Data tersimpan, namun PDF gagal: " + pdfResponse);
+                    } else {
+                        try {
+                            var link = document.createElement('a');
+                            link.href = 'data:application/pdf;base64,' + pdfResponse;
+                            link.download = 'Bukti_Pendaftaran_SPMB.pdf';
+                            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                        } catch(e) { alert("Data tersimpan, namun PDF gagal diproses: " + e.message); }
+                    }
+                    changeScreen('screenSuccess');
+                }, function() { 
+                    showLoader(false); alert("Data tersimpan, namun PDF gagal diunduh. Silakan unduh manual."); changeScreen('screenSuccess'); 
+                });
+            } else { alert("Gagal menyimpan: " + response); }
+        }, function(err) {
+            showLoader(false); alert("Gagal koneksi server: " + err);
+        });
+    }
+
+    function downloadPDF() {
+        showLoader(true, "Mencetak Dokumen...");
+        var statusEl = document.getElementById('statusPdf');
+        if(statusEl) statusEl.innerText = "Menyiapkan file PDF...";
+        
+        fetchApi('generatePDF_F4', CONFIG.kode_otorisasi, function(response) {
+            showLoader(false);
+            if(response && String(response).indexOf("ERROR") === 0) {
+                alert(response); if(statusEl) statusEl.innerText = "Terjadi kesalahan server."; return;
+            }
+            try {
+                var link = document.createElement('a');
+                link.href = 'data:application/pdf;base64,' + response;
+                link.download = 'Bukti_Pendaftaran_SPMB.pdf';
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                if(statusEl) statusEl.innerText = "✅ PDF Berhasil Diunduh!";
+            } catch(e) {
+                showLoader(false); if(statusEl) statusEl.innerText = "Gagal memproses file.";
+                alert("Gagal memproses file di browser Anda: " + e.message);
+            }
+        }, function(err) {
+            showLoader(false); if(statusEl) statusEl.innerText = "Koneksi terputus."; alert("Koneksi terputus saat membuat PDF.");
+        });
+    }
+
+    function bukaScreenJadwal() {
+        changeScreen('screenJadwal');
+        var container = document.getElementById('jadwal-container');
+        container.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh;"><div style="font-size:0.9rem; font-weight:700; color:#475569;">Memuat Data...</div></div>';
+        
+        fetchApi('getJadwal', null, function(responseStr) {
+            var res = JSON.parse(responseStr);
+            if (res.status === 'SUCCESS') {
+                renderJadwal(res.data);
+            } else {
+                container.innerHTML = '<div class="text-center text-red-500 font-bold py-10">' + res.msg + '</div>';
+            }
+        }, function(e) {
+            container.innerHTML = '<div class="text-center text-red-500 font-bold py-10">Gagal memuat jadwal: ' + e.message + '</div>';
+        });
+    }
+
+    function renderJadwal(data) {
+        var container = document.getElementById('jadwal-container');
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="text-center text-slate-500 font-bold py-10">Belum ada data jadwal.</div>';
+            return;
+        }
+
+        var todayStr = Utilities_formatDateMakassar(new Date());
+
+        var activeTahapName = "Belum ada kegiatan";
+        var allDone = true;
+        var activeItems = []; 
+
+        for (var j = 0; j < data.length; j++) {
+            var st = String(data[j].status || "").trim().toUpperCase();
+            var m = String(data[j].tanggalmulai || "").trim().substring(0, 10);
+            var s = String(data[j].tanggalselesai || "").trim().substring(0, 10);
+            
+            var isActive = false;
+            if (m && s && todayStr >= m && todayStr <= s) isActive = true;
+            else if (m && !s && todayStr === m) isActive = true;
+
+            if (isActive) {
+                activeItems.push(data[j]);
+                allDone = false;
+            }
+
+            if (st !== "SELESAI") {
+                if (s && s >= todayStr) allDone = false;
+                if (!s && m && m >= todayStr) allDone = false;
+            }
+        }
+
+        if (activeItems.length > 0) {
+            var patokan = activeItems[0];
+            var tahapPatokan = String(patokan.tahap || "Kegiatan Aktif").trim();
+            var mMulai = String(patokan.tanggalmulai || "").trim().substring(0, 10);
+            var mSelesai = String(patokan.tanggalselesai || "").trim().substring(0, 10);
+            
+            var grupAktif = activeItems.filter(function(item) {
+                var tm = String(item.tanggalmulai || "").trim().substring(0, 10);
+                var ts = String(item.tanggalselesai || "").trim().substring(0, 10);
+                var th = String(item.tahap || "").trim();
+                return th === tahapPatokan && tm === mMulai && ts === mSelesai;
+            });
+
+            var jalurList = [];
+            for (var k = 0; k < grupAktif.length; k++) {
+                var jl = String(grupAktif[k].jalur || "").trim().toUpperCase();
+                if (jl && jalurList.indexOf(jl) === -1) {
+                    jalurList.push(jl);
+                }
+            }
+            jalurList.sort(); 
+            
+            var namaJalurGabung = jalurList.length > 0 ? " - " + jalurList.join('/') : "";
+            activeTahapName = tahapPatokan + namaJalurGabung;
+            
+        } else if (allDone) {
+            activeTahapName = "Semua tahap selesai";
+        }
+
+        var bannerHtml = '<div class="text-right mb-8 relative z-10">';
+        bannerHtml += '<p class="text-xs font-medium text-slate-500 mb-1">Hari ini: <span class="font-bold text-slate-700">' + formatDateIndo(todayStr) + '</span></p>';
+        bannerHtml += '<p class="text-[13px] font-extrabold text-slate-800 uppercase">' + activeTahapName + '</p>';
+        bannerHtml += '</div>';
+
+        var html = bannerHtml + '<div class="timeline-container"><div class="timeline-line"></div>';
+
+        for (var i = 0; i < data.length; i++) {
+            var item = data[i];
+            var statusTeks = String(item.status || "").trim().toUpperCase();
+            var tglMulaiStr = String(item.tanggalmulai || "").trim();
+            var tglSelesaiStr = String(item.tanggalselesai || "").trim();
+            
+            var m = tglMulaiStr ? tglMulaiStr.substring(0, 10) : "";
+            var s = tglSelesaiStr ? tglSelesaiStr.substring(0, 10) : "";
+
+            var dotClass = "dot-gray";
+            var titleColor = "text-gray-400";
+            var detailColor = "text-gray-400";
+            var jalurColor = "text-gray-400"; 
+            var iconWarning = "";
+            var fontBoldActive = "";
+            var isDitunda = (statusTeks === "DITUNDA");
+            
+            var badgeStatusRight = ""; 
+            
+            if (isDitunda) {
+                dotClass = "dot-yellow";
+                titleColor = "text-amber-500";
+                detailColor = "text-amber-500";
+                jalurColor = "text-amber-500";
+                iconWarning = "⚠️ ";
+            } else if (statusTeks === "SELESAI" || (s && s < todayStr) || (!s && m && m < todayStr && statusTeks !== "DITUNDA")) {
+                dotClass = "dot-red";
+                titleColor = "text-red-500";
+                detailColor = "text-red-500";
+                jalurColor = "text-red-500";
+                badgeStatusRight = '<span class="text-[11px] font-bold text-[#ef4444] uppercase tracking-wider">DITUTUP</span>';
+            } else if ((m && s && todayStr >= m && todayStr <= s) || (m && !s && todayStr === m)) {
+                dotClass = "dot-green-pulse";
+                titleColor = "text-green-500";
+                detailColor = "text-green-500";
+                jalurColor = "text-black font-extrabold"; 
+                fontBoldActive = "font-bold";
+                badgeStatusRight = '<span class="text-[11px] font-bold text-[#22c55e] uppercase tracking-wider">DIBUKA</span>';
+            } else {
+                dotClass = "dot-gray";
+                titleColor = "text-gray-400";
+                detailColor = "text-gray-400";
+                jalurColor = "text-gray-400";
+            }
+
+            html += '<div class="timeline-item">';
+            html += '<div class="timeline-dot ' + dotClass + '"></div>';
+            html += '<div class="timeline-card">';
+            
+            if (isDitunda) {
+                html += '<div class="banner-yellow">Jadwal Ditunda</div>';
+            }
+
+            html += '<div class="flex justify-between items-start gap-2 mb-1">';
+            html += '<h3 class="text-sm font-bold ' + titleColor + ' ' + fontBoldActive + ' m-0 leading-tight">' + iconWarning + (item.tahap || "-") + '</h3>';
+            html += badgeStatusRight;
+            html += '</div>';
+            
+            if (item.jalur) {
+                html += '<div class="text-[11px] uppercase tracking-wide mb-2 ' + jalurColor + '">' + item.jalur + '</div>';
+            }
+
+            html += '<div class="text-xs ' + detailColor + ' space-y-1 ' + fontBoldActive + '">';
+            var dateText = "";
+            if (tglMulaiStr && tglSelesaiStr && tglMulaiStr !== tglSelesaiStr) {
+                dateText = formatDateIndo(tglMulaiStr) + " - " + formatDateIndo(tglSelesaiStr);
+            } else if (tglMulaiStr) {
+                dateText = formatDateIndo(tglMulaiStr);
+            } else {
+                dateText = "-";
+            }
+            
+            html += '<div class="flex items-start gap-2"><i class="fas fa-calendar-alt mt-1 w-4 opacity-70"></i><span>' + dateText + '</span></div>';
+            
+            if (item.jam) {
+                html += '<div class="flex items-start gap-2"><i class="fas fa-clock mt-1 w-4 opacity-70"></i><span>' + item.jam + ' WITA</span></div>';
+            }
+            
+            html += '</div></div></div>'; 
+        }
+
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function Utilities_formatDateMakassar(date) {
+        var options = { timeZone: 'Asia/Makassar', year: 'numeric', month: '2-digit', day: '2-digit' };
+        var formatter = new Intl.DateTimeFormat('en-CA', options); 
+        return formatter.format(date);
+    }
+
+    function formatDateIndo(dateStr) {
+        if (!dateStr) return "";
+        var parts = dateStr.substring(0, 10).split("-");
+        if (parts.length !== 3) return dateStr;
+        var months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        return parseInt(parts[2], 10) + " " + months[parseInt(parts[1], 10) - 1] + " " + parts[0];
+    }
+
+    var globalInfoData = [];
+
+    function bukaScreenInformasi() {
+        changeScreen('screenInformasi');
+        var container = document.getElementById('info-list-container');
+        
+        container.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:50vh;"><div class="spinner-border text-blue-600 mb-3" role="status"></div><div style="font-size:0.9rem; font-weight:700; color:#475569;">Memuat Persyaratan...</div></div>';
+
+        fetchApi('getInformasi', null, function(responseStr) {
+            var res = JSON.parse(responseStr);
+            if (res.status === 'SUCCESS') {
+                globalInfoData = res.data;
+                switchInfoTab('UM'); 
+            } else {
+                container.innerHTML = '<div class="text-center text-red-500 font-bold py-10">' + res.msg + '</div>';
+            }
+        }, function(e) {
+            container.innerHTML = '<div class="text-center text-red-500 font-bold py-10">Gagal terhubung ke server. Periksa internet Anda.</div>';
+        });
+    }
+
+    function switchInfoTab(tabId) {
+        var tabs = document.querySelectorAll('.info-tab-btn');
+        for(var i = 0; i < tabs.length; i++) {
+            tabs[i].classList.remove('text-blue-600', 'border-blue-600', 'font-black');
+            tabs[i].classList.add('text-slate-400', 'border-transparent', 'font-semibold');
+        }
+        var activeBtn = document.getElementById('tab-info-' + tabId);
+        if(activeBtn) {
+            activeBtn.classList.remove('text-slate-400', 'border-transparent', 'font-semibold');
+            activeBtn.classList.add('text-blue-600', 'border-blue-600', 'font-black');
+        }
+
+        var filteredData = [];
+        var tabUpper = tabId.toUpperCase();
+        for(var j = 0; j < globalInfoData.length; j++) {
+            var item = globalInfoData[j];
+            var kat = String(item.kategori || '').trim().toUpperCase();
+            var jal = String(item.jalur    || '').trim().toUpperCase();
+            if(tabUpper === 'UM' && kat === 'UM') {
+                filteredData.push(item);
+            } else if (tabUpper !== 'UM' && kat === 'KHUS' && jal === tabUpper) {
+                filteredData.push(item);
+            }
+        }
+        renderInfoList(filteredData);
+    }
+
+    function renderInfoList(data) {
+        var container = document.getElementById('info-list-container');
+        if(data.length === 0) {
+            container.innerHTML = '<div class="text-center text-slate-400 font-bold py-16 mt-10"><i class="fas fa-folder-open text-5xl mb-4 opacity-30"></i><br>Belum ada persyaratan<br>untuk jalur ini.</div>';
+            return;
+        }
+
+        var html = '';
+        for(var i = 0; i < data.length; i++) {
+            var animDelay = i * 0.08;
+            var noUrut    = String(data[i].no || (i + 1));
+            var judulTeks = String(data[i].judul || '').trim();
+            var isiTeks   = String(data[i].isi   || '').trim();
+            var judulHtml = judulTeks
+                ? '<div style="font-size:0.8rem;font-weight:700;color:#1e293b;line-height:1.4;">' + judulTeks + '</div>'
+                : '';
+            var isiHtml = isiTeks
+                ? '<div style="font-size:0.75rem;font-weight:400;color:#64748b;margin-top:4px;line-height:1.55;">' + isiTeks + '</div>'
+                : '';
+            html += '<div class="bg-white p-4 rounded-[16px] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.05)] border border-slate-200 mb-3 flex gap-4 items-start"'
+                 +  ' style="animation: slideUp 0.4s ease forwards ' + animDelay + 's; opacity:0;">'
+                 + '<div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-black flex-shrink-0 text-sm border border-blue-100">' + noUrut + '</div>'
+                 + '<div class="pt-1 w-full">' + judulHtml + isiHtml + '</div>'
+                 + '</div>';
+        }
+        container.innerHTML = html;
+    }
+</script>
+
+</body>
+</html>
