@@ -1205,23 +1205,12 @@
         fetchApi('saveData', payload, function(response) {
             showLoader(false);
             if(String(response).trim().toUpperCase() === "SUCCESS") {
-                showLoader(true, "Mencetak Bukti Daftar...");
-                fetchApi('generatePDF_F4', CONFIG.kode_otorisasi, function(pdfResponse) {
-                    showLoader(false);
-                    if(pdfResponse && String(pdfResponse).indexOf("ERROR") === 0) {
-                        alert("Data tersimpan, namun PDF gagal: " + pdfResponse);
-                    } else {
-                        try {
-                            var link = document.createElement('a');
-                            link.href = 'data:application/pdf;base64,' + pdfResponse;
-                            link.download = 'Bukti_Pendaftaran_SPMB.pdf';
-                            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-                        } catch(e) { alert("Data tersimpan, namun PDF gagal diproses: " + e.message); }
-                    }
-                    changeScreen('screenSuccess');
-                }, function() { 
-                    showLoader(false); alert("Data tersimpan, namun PDF gagal diunduh. Silakan unduh manual."); changeScreen('screenSuccess'); 
-                });
+                // Data berhasil disimpan — langsung ke screenSuccess.
+                // PDF dibuat terpisah saat tombol Unduh diklik,
+                // sehingga data di sheet sudah pasti stabil dan tidak ada race condition.
+                var statusEl = document.getElementById('statusPdf');
+                if(statusEl) statusEl.innerText = '';
+                changeScreen('screenSuccess');
             } else { alert("Gagal menyimpan: " + response); }
         }, function(err) {
             showLoader(false); alert("Gagal koneksi server: " + err);
@@ -1232,24 +1221,59 @@
         showLoader(true, "Mencetak Dokumen...");
         var statusEl = document.getElementById('statusPdf');
         if(statusEl) statusEl.innerText = "Menyiapkan file PDF...";
-        
+
         fetchApi('generatePDF_F4', CONFIG.kode_otorisasi, function(response) {
             showLoader(false);
-            if(response && String(response).indexOf("ERROR") === 0) {
-                alert(response); if(statusEl) statusEl.innerText = "Terjadi kesalahan server."; return;
+            if(!response || String(response).indexOf("ERROR") === 0) {
+                if(statusEl) statusEl.innerText = "Terjadi kesalahan server.";
+                alert(response || "PDF gagal dibuat di server.");
+                return;
             }
             try {
-                var link = document.createElement('a');
-                link.href = 'data:application/pdf;base64,' + response;
-                link.download = 'Bukti_Pendaftaran_SPMB.pdf';
-                document.body.appendChild(link); link.click(); document.body.removeChild(link);
-                if(statusEl) statusEl.innerText = "✅ PDF Berhasil Diunduh!";
+                // Konversi base64 ke Blob — metode ini kompatibel di semua browser
+                // termasuk Safari iOS yang tidak mendukung <a download> pada data: URL
+                var byteChars = atob(response);
+                var byteArr = new Uint8Array(byteChars.length);
+                for(var i = 0; i < byteChars.length; i++) {
+                    byteArr[i] = byteChars.charCodeAt(i);
+                }
+                var blob = new Blob([byteArr], { type: 'application/pdf' });
+                var blobUrl = URL.createObjectURL(blob);
+
+                // Deteksi iOS/Safari: tidak mendukung atribut download pada anchor
+                var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+                if(isIOS || isSafari) {
+                    // iOS/Safari: buka PDF di tab baru, pengguna bisa simpan via Share → Save to Files
+                    var newTab = window.open(blobUrl, '_blank');
+                    if(!newTab) {
+                        // Popup diblokir browser — fallback: navigasi langsung
+                        window.location.href = blobUrl;
+                    }
+                    if(statusEl) statusEl.innerText = "✅ PDF siap — ketuk ikon Bagikan lalu 'Simpan ke File'";
+                } else {
+                    // Android / Desktop: unduh langsung via link
+                    var link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = 'Bukti_Pendaftaran_SPMB.pdf';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    if(statusEl) statusEl.innerText = "✅ PDF Berhasil Diunduh!";
+                }
+
+                // Bebaskan memori Blob URL setelah jeda singkat
+                setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 10000);
+
             } catch(e) {
-                showLoader(false); if(statusEl) statusEl.innerText = "Gagal memproses file.";
+                if(statusEl) statusEl.innerText = "Gagal memproses file.";
                 alert("Gagal memproses file di browser Anda: " + e.message);
             }
         }, function(err) {
-            showLoader(false); if(statusEl) statusEl.innerText = "Koneksi terputus."; alert("Koneksi terputus saat membuat PDF.");
+            showLoader(false);
+            if(statusEl) statusEl.innerText = "Koneksi terputus.";
+            alert("Koneksi terputus saat membuat PDF.");
         });
     }
 
