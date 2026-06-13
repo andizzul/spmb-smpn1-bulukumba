@@ -284,7 +284,7 @@
             <div style="background:linear-gradient(160deg,#1a3fbf 0%,#2563eb 60%,#3b82f6 100%);padding:3.8rem 1.6rem 5.8rem;position:relative;overflow:hidden">
                 <div style="position:absolute;top:-60px;right:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.06)"></div>
                 <div style="position:absolute;bottom:-40px;left:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.04)"></div>
-                <h2 style="color:#fff;font-size:1.75rem;font-weight:900;margin:0 0 0.6rem;letter-spacing:-0.02em">Halo, Calon Murid Baru!</h2>
+                <h2 style="color:#fff;font-size:1.75rem;font-weight:900;margin:0 0 0.6rem;letter-spacing:-0.02em">Halo, Calon Murid Baru! 👋</h2>
                 <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.15);padding:8px 16px;border-radius:50px;backdrop-filter:blur(8px)">
                     <i class="fas fa-id-badge" style="color:#93c5fd;font-size:0.85rem"></i>
                     <span id="displayKodeUser" style="color:#fff;font-weight:900;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase"></span>
@@ -1209,6 +1209,8 @@
             var resStr = String(response === null || response === undefined ? '' : response).trim().toUpperCase();
             var isSuccess = resStr === 'SUCCESS' || resStr.indexOf('SUCCESS') !== -1;
             if(isSuccess) {
+                // Perbarui status di memori agar bukaDaftar() tahu data sudah terkunci
+                CONFIG.status_isian = 'selesai';
                 // Tampilkan konfirmasi singkat bahwa data telah tersimpan
                 showLoader(true, "✅ Data berhasil tersimpan!");
                 setTimeout(function() {
@@ -1228,7 +1230,8 @@
                 || errMsg.indexOf('Failed to fetch') !== -1
                 || errMsg.indexOf('NetworkError') !== -1;
             if(isNetworkOrDomErr) {
-                // Data sudah tersimpan di sheet — langsung ke screenSuccess
+                // Data sudah tersimpan di sheet — perbarui status di memori
+                CONFIG.status_isian = 'selesai';
                 showLoader(true, "✅ Data berhasil tersimpan!");
                 setTimeout(function() {
                     showLoader(false);
