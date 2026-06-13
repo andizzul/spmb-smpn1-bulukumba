@@ -1215,7 +1215,7 @@
                     showLoader(false);
                     var statusEl = document.getElementById('statusPdf');
                     if(statusEl) statusEl.innerText = '';
-                    changeScreen('screenSuccess');
+                    changeScreen('screenLocked');
                 }, 1200);
             } else { alert("Gagal menyimpan: " + response); }
         }, function(err) {
@@ -1234,7 +1234,7 @@
                     showLoader(false);
                     var statusEl = document.getElementById('statusPdf');
                     if(statusEl) statusEl.innerText = '';
-                    changeScreen('screenSuccess');
+                    changeScreen('screenLocked');
                 }, 1200);
             } else {
                 alert("Gagal koneksi server: " + errMsg);
