@@ -270,7 +270,7 @@
                     </button>
                     <p id="statusPdf" class="text-[10px] font-bold text-blue-200 mb-4 min-h-[15px]"></p>
                     
-                    <button type="button" onclick="changeScreen('screenHome')" class="text-[11px] font-bold text-white/70 hover:text-white transition-colors uppercase tracking-wider flex items-center justify-center gap-1 mx-auto">
+                    <button type="button" onclick="changeScreen('screenHome'); updateInfoStatus();" class="text-[11px] font-bold text-white/70 hover:text-white transition-colors uppercase tracking-wider flex items-center justify-center gap-1 mx-auto">
                         <i class="fas fa-arrow-left"></i> Kembali ke Beranda
                     </button>
                 </div>
@@ -1033,6 +1033,22 @@
         }, function(err) {
             showLoader(false); showError("Koneksi internet terputus.");
         });
+    }
+
+    function updateInfoStatus() {
+        var draftBox = document.getElementById('infoDraft');
+        if (!draftBox) return;
+        draftBox.style.display = 'flex';
+        var lblStatus   = document.getElementById('lblStatusDraft');
+        var titleStatus = lblStatus.previousElementSibling;
+        var iconDraft   = document.querySelector('#infoDraft i');
+        if (CONFIG.status_isian === 'selesai') {
+            titleStatus.textContent = 'Data Terkunci';
+            lblStatus.textContent   = 'Anda telah melakukan finalisasi. Data telah terkirim dan tidak dapat diubah lagi.';
+            draftBox.style.backgroundColor = '#fef2f2'; draftBox.style.borderColor = '#dc2626';
+            titleStatus.style.color = '#b91c1c'; lblStatus.style.color = '#b91c1c';
+            iconDraft.style.color   = '#dc2626'; iconDraft.className = 'fas fa-lock';
+        }
     }
 
     function bukaDaftar() {
