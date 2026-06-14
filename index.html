@@ -471,7 +471,7 @@
                         <div class="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
                             <label class="form-label mb-1">NIK (Nomor Induk Kependudukan) <span class="required-star">*</span></label>
                             <span class="nik-error mb-2"><i class="fas fa-info-circle"></i> NIK wajib persis 16 digit angka!</span>
-                            <input type="text" inputmode="numeric" maxlength="16" name="nik" class="form-control req nik-field bg-white" required placeholder="Contoh: 73020xxxxxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this);">
+                            <input type="text" inputmode="numeric" maxlength="16" name="nik" class="form-control req nik-field bg-white" required placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this);">
                         </div>
 
                         <div class="mb-3"><label class="form-label">Nomor Formulir <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="nomor_formulir" class="form-control req" required placeholder="Contoh: 001" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
@@ -490,18 +490,18 @@
                             <div class="col-5"><label class="form-label">Tgl Lahir <span class="required-star">*</span></label><input type="date" name="tanggal_lahir" class="form-control req" required></div>
                         </div>
                         
-                        <div class="mb-3"><label class="form-label">Alamat Rumah (Sesuai KK) <span class="required-star">*</span></label><textarea name="alamat_rumah" class="form-control req" required rows="2" placeholder="Nama Jalan / Kampung..."></textarea></div>
+                        <div class="mb-3"><label class="form-label">Alamat Rumah (Sesuai KK) <span class="required-star">*</span></label><textarea name="alamat_rumah" class="form-control req" required rows="2" placeholder=""></textarea></div>
                         
                         <div class="row g-2 mb-3">
                             <div class="col-6"><label class="form-label">Dusun/Lingk. <span class="required-star">*</span></label><input type="text" name="dusun" class="form-control req" required></div>
                             <div class="col-6"><label class="form-label">Desa/Kelur. <span class="required-star">*</span></label><input type="text" name="desa_kelurahan" class="form-control req" required></div>
                         </div>
                         
-                        <div class="mb-3"><label class="form-label">Kecamatan <span class="required-star">*</span></label><input type="text" name="kecamatan" class="form-control req" required placeholder="Contoh: Ujung Bulu"></div>
+                        <div class="mb-3"><label class="form-label">Kecamatan <span class="required-star">*</span></label><input type="text" name="kecamatan" class="form-control req" required placeholder=""></div>
                         
                         <div class="row g-2 mb-3">
-                            <div class="col-6"><label class="form-label">Kabupaten <span class="required-star">*</span></label><input type="text" name="kabupaten" class="form-control req" required placeholder="Contoh: Bulukumba"></div>
-                            <div class="col-6"><label class="form-label">Provinsi <span class="required-star">*</span></label><input type="text" name="provinsi" class="form-control req" required placeholder="Sulawesi Selatan"></div>
+                            <div class="col-6"><label class="form-label">Kabupaten <span class="required-star">*</span></label><input type="text" name="kabupaten" class="form-control req" required placeholder=""></div>
+                            <div class="col-6"><label class="form-label">Provinsi <span class="required-star">*</span></label><input type="text" name="provinsi" class="form-control req" required placeholder=""></div>
                         </div>
                         
                         <div class="row g-2 mb-3">
