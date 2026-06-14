@@ -530,7 +530,7 @@
                     </div>
 
                     <button type="button" onclick="nextStep(1)" class="btn-modern w-full bg-blue-600 text-white shadow-lg shadow-blue-500/30 active:scale-95">LANJUTKAN <i class="fas fa-chevron-right ml-1"></i></button>
-                    <div id="errStep1" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Mohon lengkapi isian kosong. Pastikan NIK 16 digit dan Tanggal lahir telah terisi.</div>
+                    <div id="errStep1" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Lengkapi data dulu. Pastikan NIK 16 digit dan Tanggal lahir telah terisi.</div>
                 </div>
 
                 <!-- STEP 2: DATA ORANG TUA -->
@@ -631,7 +631,7 @@
                         <button type="button" onclick="prevStep(2)" class="btn-modern bg-slate-200 text-slate-700 active:scale-95 flex-1">KEMBALI</button>
                         <button type="button" onclick="nextStep(2)" class="btn-modern bg-blue-600 text-white shadow-lg shadow-blue-500/30 active:scale-95 flex-[2]">LANJUTKAN <i class="fas fa-chevron-right ml-1"></i></button>
                     </div>
-                    <div id="errStep2" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Lengkapi data Orang Tua/Wali & pastikan NIK 16 digit.</div>
+                    <div id="errStep2" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Lengkapi data dulu. Pastikan NIK 16 digit dan Tanggal lahir telah terisi.</div>
                 </div>
 
                 <!-- STEP 3: DATA PERIODIK -->
@@ -642,8 +642,8 @@
                     </div>
                     
                     <div class="card-form">
-                        <div class="mb-3"><label class="form-label">No HP Orang Tua Aktif <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="no_hp_ortu" class="form-control req step3-req" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
-                        <div class="mb-3"><label class="form-label">Email Belajar.id (Opsional)</label><input type="email" name="email_belajar_id" class="form-control"></div>
+                        <div class="mb-3"><label class="form-label">No HP/WA orang tua <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="no_hp_ortu" class="form-control req step3-req" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                        <div class="mb-3"><label class="form-label">Email belajar.id (opsional)</label><input type="email" name="email_belajar_id" class="form-control"></div>
                         
                         <div class="row g-2 mb-3">
                             <div class="col-4"><label class="form-label">Tinggi <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="tinggi_badan" class="form-control req step3-req text-center" required placeholder="cm" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
@@ -711,7 +711,7 @@
                                 <i class="fas fa-paper-plane"></i> KIRIM
                             </button>
                         </div>
-                        <div id="errStep3" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Mohon lengkapi semua isian di atas!</div>
+                        <div id="errStep3" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Lengkapi data dulu!</div>
                     </div>
                 </div>
 
