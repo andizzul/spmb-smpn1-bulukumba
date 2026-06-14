@@ -725,18 +725,11 @@
     // MASUKKAN URL DEPLOY WEB APP GAS ANDA DI SINI
     const API_URL = "https://script.google.com/macros/s/AKfycbyEufeBCjzYi7sm1AMt7Hcoj5oJ-2fjYl9_4lbKSx_l84U0oyH7LKX7pBt1lUmwMRNY/exec"; // <-- GANTI INI!!
 
-    // FUNGSI KOMUNIKASI API (Pengganti google.script.run) - ANTI CACHE VERCEL
+    // FUNGSI KOMUNIKASI API (Pengganti google.script.run)
     function fetchApi(action, payload, onSuccess, onFailure) {
-        // INJEKSI: Tambahkan timestamp agar URL selalu unik (memaksa Vercel bypass cache)
-        var noCacheUrl = API_URL + "?t=" + new Date().getTime();
-        
-        fetch(noCacheUrl, {
+        fetch(API_URL, {
             method: 'POST',
-            cache: 'no-store', // INJEKSI: Paksa browser & server tidak menyimpan cache
-            headers: { 
-                'Content-Type': 'text/plain;charset=utf-8',
-                'Cache-Control': 'no-cache, no-store, must-revalidate'
-            },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: action, payload: payload })
         })
         .then(function(res) { return res.json(); })
@@ -997,14 +990,6 @@
                 el.textContent = _nama ? toProperCase(_nama) : kode;
                 el.style.textTransform = _nama ? 'none' : 'uppercase';
                 CONFIG.status_isian = (response.status_isian || '').toLowerCase();
-                // INJEKSI: BERSIIIIHKAN DULU SEMUA ISI FORMULIR SEBELUM DIISI!
-                    document.getElementById('formBiodata').reset();
-                    var reqInputs = document.querySelectorAll('.req, .val-wali');
-                    for(var ix = 0; ix < reqInputs.length; ix++) {
-                        reqInputs[ix].classList.remove('input-filled', 'invalid-nik');
-                    }
-                    var toggles = document.querySelectorAll('.toggle-switch input');
-                    for(var tx = 0; tx < toggles.length; tx++) { toggles[tx].checked = false; }
                 
                 if(response.data) populateForm(response.data);
                 
