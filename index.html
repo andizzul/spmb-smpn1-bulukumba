@@ -471,7 +471,7 @@
                         <div class="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
                             <label class="form-label mb-1">NIK (Nomor Induk Kependudukan) <span class="required-star">*</span></label>
                             <span class="nik-error mb-2"><i class="fas fa-info-circle"></i> NIK wajib persis 16 digit angka!</span>
-                            <input type="text" inputmode="numeric" maxlength="16" name="nik" class="form-control req nik-field bg-white" required placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this);">
+                            <input type="text" inputmode="numeric" maxlength="16" name="nik" class="form-control req nik-field bg-white" required placeholder="" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this);">
                         </div>
 
                         <div class="mb-3"><label class="form-label">Nomor Formulir <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="nomor_formulir" class="form-control req" required placeholder="Contoh: 001" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
