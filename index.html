@@ -814,10 +814,16 @@
                 var sessionData = JSON.parse(savedSession);
                 document.getElementById('inputKode').value = sessionData.kode;
                 prosesLogin(true);
+            } else {
+                // Tidak ada sesi — tampilkan screenLogin dan matikan loader
+                showLoader(false);
+                changeScreen('screenLogin');
             }
         }, function() {
             // Jika API gagal dipanggil (misal: tidak ada koneksi),
-            // default aman: tetap tampilkan screenLogin agar tidak stuck loader
+            // default aman: tampilkan screenLogin agar tidak stuck loader
+            showLoader(false);
+            changeScreen('screenLogin');
             fetchApi('getLinkUrl', null, function(url) {
                 if(url) document.getElementById('screenLogin').style.backgroundImage = "url('" + url + "')";
             });
