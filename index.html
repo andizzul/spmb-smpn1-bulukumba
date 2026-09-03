@@ -226,6 +226,40 @@
     <!-- TOAST BACKGROUND SAVE -->
     <div id="toast"><i class="fas fa-cloud-upload-alt text-blue-400 mr-2"></i> Menyimpan draft otomatis...</div>
 
+    <!-- MAINTENANCE SCREEN -->
+    <div id="screenMaintenance" class="screen" style="display:none!important;background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);min-height:100vh;align-items:center;justify-content:center;padding:2rem;">
+        <div style="width:100%;max-width:420px;text-align:center;">
+            <!-- Ikon animasi -->
+            <div style="margin-bottom:2rem;position:relative;display:inline-block;">
+                <div style="width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 0 0 16px rgba(99,102,241,0.12),0 0 0 32px rgba(99,102,241,0.06);animation:mtn-pulse 2.4s ease-in-out infinite;">
+                    <i class="fas fa-tools" style="font-size:2.4rem;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- Badge status -->
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.35);border-radius:999px;padding:6px 18px;margin-bottom:1.5rem;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#ef4444;display:inline-block;animation:mtn-blink 1.2s ease-in-out infinite;"></span>
+                <span style="color:#fca5a5;font-size:0.72rem;font-weight:800;letter-spacing:0.12em;">PENDAFTARAN DITUTUP</span>
+            </div>
+            <!-- Judul -->
+            <h1 style="color:#fff;font-size:1.6rem;font-weight:900;margin:0 0 1rem;letter-spacing:-0.02em;line-height:1.25;">Portal SPMB<br><span style="color:#a5b4fc;">Sementara Tidak Aktif</span></h1>
+            <!-- Pesan dari spreadsheet -->
+            <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:1.25rem 1.5rem;margin-bottom:2rem;">
+                <p id="pesanMaintenance" style="color:#cbd5e1;font-size:0.875rem;font-weight:500;line-height:1.7;margin:0;text-align:justify;"></p>
+            </div>
+            <!-- Info sekolah -->
+            <p style="color:#475569;font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">SMP Negeri 1 Bulukumba</p>
+        </div>
+        <style>
+            @keyframes mtn-pulse {
+                0%,100% { box-shadow:0 0 0 16px rgba(99,102,241,0.12),0 0 0 32px rgba(99,102,241,0.06); }
+                50%     { box-shadow:0 0 0 22px rgba(99,102,241,0.18),0 0 0 44px rgba(99,102,241,0.08); }
+            }
+            @keyframes mtn-blink {
+                0%,100% { opacity:1; } 50% { opacity:0.3; }
+            }
+        </style>
+    </div>
+
     <!-- LOGIN SCREEN -->
     <div id="screenLogin" class="screen active p-8 flex items-center justify-center" style="background-size: cover; background-position: center; background-repeat: no-repeat;">
         <div id="loginOverlay"></div>
@@ -471,7 +505,7 @@
                         <div class="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
                             <label class="form-label mb-1">NIK (Nomor Induk Kependudukan) <span class="required-star">*</span></label>
                             <span class="nik-error mb-2"><i class="fas fa-info-circle"></i> NIK wajib persis 16 digit angka!</span>
-                            <input type="text" inputmode="numeric" maxlength="16" name="nik" class="form-control req nik-field bg-white" required placeholder="" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this);">
+                            <input type="text" inputmode="numeric" maxlength="16" name="nik" class="form-control req nik-field bg-white" required placeholder="Contoh: 73020xxxxxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this);">
                         </div>
 
                         <div class="mb-3"><label class="form-label">Nomor Formulir <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="nomor_formulir" class="form-control req" required placeholder="Contoh: 001" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
@@ -490,18 +524,18 @@
                             <div class="col-5"><label class="form-label">Tgl Lahir <span class="required-star">*</span></label><input type="date" name="tanggal_lahir" class="form-control req" required></div>
                         </div>
                         
-                        <div class="mb-3"><label class="form-label">Alamat Rumah (Sesuai KK) <span class="required-star">*</span></label><textarea name="alamat_rumah" class="form-control req" required rows="2" placeholder=""></textarea></div>
+                        <div class="mb-3"><label class="form-label">Alamat Rumah (Sesuai KK) <span class="required-star">*</span></label><textarea name="alamat_rumah" class="form-control req" required rows="2" placeholder="Nama Jalan / Kampung..."></textarea></div>
                         
                         <div class="row g-2 mb-3">
                             <div class="col-6"><label class="form-label">Dusun/Lingk. <span class="required-star">*</span></label><input type="text" name="dusun" class="form-control req" required></div>
                             <div class="col-6"><label class="form-label">Desa/Kelur. <span class="required-star">*</span></label><input type="text" name="desa_kelurahan" class="form-control req" required></div>
                         </div>
                         
-                        <div class="mb-3"><label class="form-label">Kecamatan <span class="required-star">*</span></label><input type="text" name="kecamatan" class="form-control req" required placeholder=""></div>
+                        <div class="mb-3"><label class="form-label">Kecamatan <span class="required-star">*</span></label><input type="text" name="kecamatan" class="form-control req" required placeholder="Contoh: Ujung Bulu"></div>
                         
                         <div class="row g-2 mb-3">
-                            <div class="col-6"><label class="form-label">Kabupaten <span class="required-star">*</span></label><input type="text" name="kabupaten" class="form-control req" required placeholder=""></div>
-                            <div class="col-6"><label class="form-label">Provinsi <span class="required-star">*</span></label><input type="text" name="provinsi" class="form-control req" required placeholder=""></div>
+                            <div class="col-6"><label class="form-label">Kabupaten <span class="required-star">*</span></label><input type="text" name="kabupaten" class="form-control req" required placeholder="Contoh: Bulukumba"></div>
+                            <div class="col-6"><label class="form-label">Provinsi <span class="required-star">*</span></label><input type="text" name="provinsi" class="form-control req" required placeholder="Sulawesi Selatan"></div>
                         </div>
                         
                         <div class="row g-2 mb-3">
@@ -530,7 +564,7 @@
                     </div>
 
                     <button type="button" onclick="nextStep(1)" class="btn-modern w-full bg-blue-600 text-white shadow-lg shadow-blue-500/30 active:scale-95">LANJUTKAN <i class="fas fa-chevron-right ml-1"></i></button>
-                    <div id="errStep1" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Lengkapi data dulu. Pastikan NIK 16 digit dan Tanggal lahir telah terisi.</div>
+                    <div id="errStep1" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Mohon lengkapi isian kosong. Pastikan NIK 16 digit dan Tanggal lahir telah terisi.</div>
                 </div>
 
                 <!-- STEP 2: DATA ORANG TUA -->
@@ -631,7 +665,7 @@
                         <button type="button" onclick="prevStep(2)" class="btn-modern bg-slate-200 text-slate-700 active:scale-95 flex-1">KEMBALI</button>
                         <button type="button" onclick="nextStep(2)" class="btn-modern bg-blue-600 text-white shadow-lg shadow-blue-500/30 active:scale-95 flex-[2]">LANJUTKAN <i class="fas fa-chevron-right ml-1"></i></button>
                     </div>
-                    <div id="errStep2" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Lengkapi data dulu. Pastikan NIK 16 digit dan Tanggal lahir telah terisi.</div>
+                    <div id="errStep2" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Lengkapi data Orang Tua/Wali & pastikan NIK 16 digit.</div>
                 </div>
 
                 <!-- STEP 3: DATA PERIODIK -->
@@ -642,13 +676,13 @@
                     </div>
                     
                     <div class="card-form">
-                        <div class="mb-3"><label class="form-label">No HP/WA orang tua <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="no_hp_ortu" class="form-control req step3-req" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
-                        <div class="mb-3"><label class="form-label">Email belajar.id (opsional)</label><input type="email" name="email_belajar_id" class="form-control"></div>
+                        <div class="mb-3"><label class="form-label">No HP Orang Tua Aktif <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="no_hp_ortu" class="form-control req step3-req" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                        <div class="mb-3"><label class="form-label">Email Belajar.id (Opsional)</label><input type="email" name="email_belajar_id" class="form-control"></div>
                         
                         <div class="row g-2 mb-3">
                             <div class="col-4"><label class="form-label">Tinggi <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="tinggi_badan" class="form-control req step3-req text-center" required placeholder="cm" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
                             <div class="col-4"><label class="form-label">Berat <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="berat_badan" class="form-control req step3-req text-center" required placeholder="kg" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
-                            <div class="col-4"><label class="form-label">Lingkar Kepala <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="lingkar_kepala" class="form-control req step3-req text-center" required placeholder="cm" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                            <div class="col-4"><label class="form-label">L.Kepala <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="lingkar_kepala" class="form-control req step3-req text-center" required placeholder="cm" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
                         </div>
 
                         <div class="mb-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
@@ -663,7 +697,7 @@
                         </div>
 
                         <div class="mb-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
-                            <label class="form-label">Lama Perjalanan (<span id="lblTransport" class="text-blue-600">Transportasi</span>) <span class="required-star">*</span></label>
+                            <label class="form-label">Waktu Tempuh (<span id="lblTransport" class="text-blue-600">Transportasi</span>) <span class="required-star">*</span></label>
                             <div class="row g-2 mt-2">
                                 <div class="col-6"><input type="text" inputmode="numeric" name="lama_jam" class="form-control req step3-req text-center bg-white" required placeholder="Jam" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
                                 <div class="col-6"><input type="text" inputmode="numeric" name="lama_menit" class="form-control req step3-req text-center bg-white" required placeholder="Menit" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
@@ -711,7 +745,7 @@
                                 <i class="fas fa-paper-plane"></i> KIRIM
                             </button>
                         </div>
-                        <div id="errStep3" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Lengkapi data dulu!</div>
+                        <div id="errStep3" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Mohon lengkapi semua isian di atas!</div>
                     </div>
                 </div>
 
@@ -750,19 +784,49 @@
     var CONFIG = { kode_otorisasi: "" };
     var pgmTimer = null; 
 
-    window.onload = function() { 
-        initRealtimeValidation(); 
-        
-        fetchApi('getLinkUrl', null, function(url) {
-            if(url) document.getElementById('screenLogin').style.backgroundImage = "url('" + url + "')";
-        }); 
+    window.onload = function() {
+        initRealtimeValidation();
 
-        var savedSession = localStorage.getItem('spmb_session');
-        if (savedSession) {
-            var sessionData = JSON.parse(savedSession);
-            document.getElementById('inputKode').value = sessionData.kode;
-            prosesLogin(true); 
-        }
+        // Cek status pendaftaran dari sheet Pengaturan B7 PERTAMA kali sebelum apapun.
+        // Jika 'Tutup' → tampilkan screenMaintenance dengan pesan dari C7.
+        // Jika 'Buka' → jalankan alur normal (background login + auto-login).
+        fetchApi('getStatusPendaftaran', null, function(res) {
+            var status = res && res.status ? String(res.status).trim().toUpperCase() : 'TUTUP';
+            if (status !== 'BUKA') {
+                // Tampilkan layar maintenance dengan pesan dari spreadsheet
+                var pesan = (res && res.pesan) ? res.pesan : 'Pendaftaran sedang ditutup sementara.';
+                document.getElementById('pesanMaintenance').innerText = pesan;
+                // Sembunyikan loader manual (tidak pakai changeScreen agar tidak trigger hide semua screen)
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('loader').style.display = 'none';
+                changeScreen('screenMaintenance');
+                return; // Hentikan, tidak lanjut ke alur normal
+            }
+
+            // Status BUKA — jalankan alur normal
+            fetchApi('getLinkUrl', null, function(url) {
+                if(url) document.getElementById('screenLogin').style.backgroundImage = "url('" + url + "')";
+            });
+
+            var savedSession = localStorage.getItem('spmb_session');
+            if (savedSession) {
+                var sessionData = JSON.parse(savedSession);
+                document.getElementById('inputKode').value = sessionData.kode;
+                prosesLogin(true);
+            }
+        }, function() {
+            // Jika API gagal dipanggil (misal: tidak ada koneksi),
+            // default aman: tetap tampilkan screenLogin agar tidak stuck loader
+            fetchApi('getLinkUrl', null, function(url) {
+                if(url) document.getElementById('screenLogin').style.backgroundImage = "url('" + url + "')";
+            });
+            var savedSession = localStorage.getItem('spmb_session');
+            if (savedSession) {
+                var sessionData = JSON.parse(savedSession);
+                document.getElementById('inputKode').value = sessionData.kode;
+                prosesLogin(true);
+            }
+        });
     };
 
     function changeScreen(id) {
@@ -1211,7 +1275,7 @@
         if (isLulus && ket) {
             textKeteranganLulus += '<br><br><span class="text-blue-700 font-semibold">Catatan:</span> Silahkan melakukan pendaftaran ulang pada waktu yang telah ditentukan.';
         }
-        var textKeteranganGagal = "Jangan patah semangat dan teruslah berdoa. Setiap usaha Anda tetap bernilai. Percayalah, kesempatan terbaik akan terbuka di waktu yang tepat.";
+        var textKeteranganGagal = "Kegagalan hari ini bukan akhir dari segalanya. Setiap usaha yang Anda lakukan tetaplah berharga dan menjadi bekal untuk langkah berikutnya. Tetap semangat, terus belajar, dan percayalah bahwa pintu kesempatan terbaik akan terbuka di waktu yang tepat.";
 
         var html = '';
         html += '<div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 20px; background-color: #f8fafc;">';
