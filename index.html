@@ -216,11 +216,12 @@
         <span id="loaderText" class="text-xs font-extrabold text-slate-700 tracking-wider uppercase">Memuat data...</span>
     </div>
     <script>
-        // Memaksa layar putih penuh dan membunuh screenLogin SEBELUM browser selesai merender
-        if (localStorage.getItem('spmb_session')) {
-            document.getElementById('loader').style.display = 'flex';
-            document.write('<style>#screenLogin { display: none !important; }</style>');
-        }
+        // Sembunyikan screenLogin dan aktifkan loader SELALU sejak awal —
+        // berlaku untuk semua kondisi (status Tutup maupun Buka, dengan/tanpa sesi tersimpan).
+        // Ini mencegah screenLogin sempat terlihat sebelum API menjawab.
+        // window.onload yang akan memutuskan screen mana yang akhirnya ditampilkan.
+        document.getElementById('loader').style.display = 'flex';
+        document.write('<style>#screenLogin { display: none !important; }</style>');
     </script>
 
     <!-- TOAST BACKGROUND SAVE -->
