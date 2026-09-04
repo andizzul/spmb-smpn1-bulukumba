@@ -1012,6 +1012,9 @@
             if(niks[k].disabled) continue;
             if(!checkNik(niks[k])) isValid = false;
         }
+        // Validasi NISN: wajib tepat 10 digit, tidak bisa lanjut jika kurang
+        var nisnEl = container.querySelector('[name="nisn"]');
+        if(nisnEl) { checkNisn(nisnEl); if(nisnEl.value.trim().length !== 10) isValid = false; }
         return isValid;
     }
 
