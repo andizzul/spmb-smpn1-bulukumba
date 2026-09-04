@@ -501,7 +501,7 @@
                     
                     <div class="card-form">
                         <div class="mb-3"><label class="form-label">Nama Lengkap (Sesuai Ijazah SD) <span class="required-star">*</span></label><input type="text" name="nama_lengkap" class="form-control req" required></div>
-                        <div class="mb-3"><label class="form-label">NISN <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="nisn" class="form-control req" required oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                        <div class="mb-3"><label class="form-label">NISN <span class="required-star">*</span></label><input type="text" inputmode="numeric" maxlength="10" name="nisn" id="inputNisn" class="form-control req" required oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10); checkNisn(this);"></div>
                         
                         <div class="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
                             <label class="form-label mb-1">NIK (Nomor Induk Kependudukan) <span class="required-star">*</span></label>
@@ -532,11 +532,11 @@
                             <div class="col-6"><label class="form-label">Desa/Kelur. <span class="required-star">*</span></label><input type="text" name="desa_kelurahan" class="form-control req" required></div>
                         </div>
                         
-                        <div class="mb-3"><label class="form-label">Kecamatan <span class="required-star">*</span></label><input type="text" name="kecamatan" class="form-control req" required placeholder="Contoh: Ujung Bulu"></div>
+                        <div class="mb-3"><label class="form-label">Kecamatan <span class="required-star">*</span></label><input type="text" name="kecamatan" class="form-control req" required></div>
                         
                         <div class="row g-2 mb-3">
-                            <div class="col-6"><label class="form-label">Kabupaten <span class="required-star">*</span></label><input type="text" name="kabupaten" class="form-control req" required placeholder="Contoh: Bulukumba"></div>
-                            <div class="col-6"><label class="form-label">Provinsi <span class="required-star">*</span></label><input type="text" name="provinsi" class="form-control req" required placeholder="Sulawesi Selatan"></div>
+                            <div class="col-6"><label class="form-label">Kabupaten <span class="required-star">*</span></label><input type="text" name="kabupaten" class="form-control req" required></div>
+                            <div class="col-6"><label class="form-label">Provinsi <span class="required-star">*</span></label><input type="text" name="provinsi" class="form-control req" required></div>
                         </div>
                         
                         <div class="row g-2 mb-3">
@@ -700,7 +700,7 @@
                         <div class="mb-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
                             <label class="form-label">Waktu Tempuh (<span id="lblTransport" class="text-blue-600">Transportasi</span>) <span class="required-star">*</span></label>
                             <div class="row g-2 mt-2">
-                                <div class="col-6"><input type="text" inputmode="numeric" name="lama_jam" class="form-control req step3-req text-center bg-white" required placeholder="Jam" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                                <div class="col-6"><input type="text" inputmode="numeric" name="lama_jam" class="form-control req step3-req text-center bg-white input-filled" required value="00" oninput="this.value=this.value.replace(/[^0-9]/g,''); if(this.value) this.classList.add('input-filled'); else { this.classList.remove('input-filled'); this.value='00'; }"></div>
                                 <div class="col-6"><input type="text" inputmode="numeric" name="lama_menit" class="form-control req step3-req text-center bg-white" required placeholder="Menit" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
                             </div>
                         </div>
@@ -911,13 +911,35 @@
         var inputNik = document.getElementById(idNik);
         var labelReq = document.getElementById(idNik === 'reqNikAyah' ? 'reqNikAyah' : 'reqNikIbu');
         if(status === 'Meninggal') {
-            inputNik.removeAttribute('required'); inputNik.classList.remove('req', 'invalid-nik');
+            // Nonaktifkan kolom NIK, isi tanda '-' sebagai nilai yang dikirim ke spreadsheet
+            inputNik.removeAttribute('required');
+            inputNik.classList.remove('req', 'invalid-nik');
+            inputNik.classList.add('input-filled');
+            inputNik.value = '-';
+            inputNik.disabled = true;
             if(labelReq) labelReq.style.display = 'none';
         } else {
-            inputNik.setAttribute('required', 'true'); inputNik.classList.add('req');
+            // Aktifkan kembali kolom NIK
+            inputNik.disabled = false;
+            inputNik.value = '';
+            inputNik.setAttribute('required', 'true');
+            inputNik.classList.add('req');
+            inputNik.classList.remove('input-filled', 'invalid-nik');
             if(labelReq) labelReq.style.display = 'inline';
         }
-        checkNik(inputNik);
+        if(status !== 'Meninggal') checkNik(inputNik);
+    }
+
+    function checkNisn(el) {
+        if(!el) return;
+        var val = el.value.trim();
+        if(val.length === 10) {
+            el.classList.add('input-filled'); el.classList.remove('invalid-nik');
+        } else if(val.length > 0) {
+            el.classList.remove('input-filled'); el.classList.add('invalid-nik');
+        } else {
+            el.classList.remove('input-filled', 'invalid-nik');
+        }
     }
 
     function cekJarak() {
@@ -1046,6 +1068,16 @@
         var lblTransport = document.getElementById('lblTransport');
         if (lblTransport) lblTransport.innerText = 'Transportasi';
 
+        // Aktifkan kembali input NIK yang mungkin di-disabled saat status Meninggal
+        var nikAyah = document.getElementById('nikAyah');
+        if (nikAyah) { nikAyah.disabled = false; }
+        var nikIbu = document.getElementById('nikIbu');
+        if (nikIbu) { nikIbu.disabled = false; }
+
+        // Reset kolom Jam ke nilai default '00'
+        var lamaJam = document.querySelector('[name="lama_jam"]');
+        if (lamaJam) { lamaJam.value = '00'; lamaJam.classList.add('input-filled'); }
+
         // Reset checkbox kesiapan & tombol kirim ke kondisi awal (terkunci)
         var checkSiap = document.getElementById('checkSiap');
         if (checkSiap) checkSiap.checked = false;
@@ -1067,7 +1099,7 @@
                 el.value = data[el.name];
                 if(el.name === 'tinggal_bersama') cekWali();
                 if(el.name === 'status_ayah') cekStatusOrangTua('statAyah', 'nikAyah');
-                if(el.name === 'status_ibu') cekStatusOrangTua('statIbu', 'nikIbu');
+                if(el.name === 'status_ibu')  cekStatusOrangTua('statIbu',  'nikIbu');
                 if(el.name === 'jarak_kategori') cekJarak();
                 if(el.name === 'transportasi') updateTransportLabel();
                 if(el.classList.contains('nik-field')) checkNik(el);
@@ -1365,7 +1397,11 @@
         var payload = { kode_otorisasi: CONFIG.kode_otorisasi, status_isian: "Draft" };
         var entires = fd.entries(); var result = entires.next();
         while (!result.done) { payload[result.value[0]] = result.value[1]; result = entires.next(); }
-        
+        // Sertakan NIK yang di-disabled (status Meninggal) karena FormData tidak menyertakannya
+        var nikAyahEl = document.getElementById('nikAyah');
+        if(nikAyahEl && nikAyahEl.disabled) payload['nik_ayah'] = nikAyahEl.value;
+        var nikIbuEl = document.getElementById('nikIbu');
+        if(nikIbuEl && nikIbuEl.disabled) payload['nik_ibu'] = nikIbuEl.value;
         fetchApi('saveData', payload);
     }
 
@@ -1377,6 +1413,11 @@
         var payload = { kode_otorisasi: CONFIG.kode_otorisasi, status_isian: "Selesai" };
         var entires = fd.entries(); var result = entires.next();
         while (!result.done) { payload[result.value[0]] = result.value[1]; result = entires.next(); }
+        // Sertakan NIK yang di-disabled (status Meninggal) karena FormData tidak menyertakannya
+        var nikAyahEl = document.getElementById('nikAyah');
+        if(nikAyahEl && nikAyahEl.disabled) payload['nik_ayah'] = nikAyahEl.value;
+        var nikIbuEl = document.getElementById('nikIbu');
+        if(nikIbuEl && nikIbuEl.disabled) payload['nik_ibu'] = nikIbuEl.value;
 
         fetchApi('saveData', payload, function(response) {
             showLoader(false);
