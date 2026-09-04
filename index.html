@@ -1096,9 +1096,21 @@
         var kodeInput = document.getElementById('inputKode').value;
         var kode = kodeInput ? kodeInput.trim() : "";
         if(!kode) return;
-        
-        showLoader(true, isAutoLogin ? "Memuat data..." : "Verifikasi Akses...");
-        document.getElementById('errorBox').classList.add('hidden');
+
+        // Cek status pendaftaran sebelum memproses login
+        showLoader(true, "Memeriksa akses...");
+        fetchApi('getStatusPendaftaran', null, function(res) {
+            var status = res && res.status ? String(res.status).trim().toUpperCase() : 'TUTUP';
+            if (status !== 'BUKA') {
+                showLoader(false);
+                var pesan = (res && res.pesan) ? res.pesan : 'Pendaftaran sedang ditutup sementara.';
+                document.getElementById('pesanMaintenance').innerText = pesan;
+                changeScreen('screenMaintenance');
+                return;
+            }
+            // Status BUKA — lanjutkan proses login seperti biasa
+            showLoader(true, isAutoLogin ? "Memuat data..." : "Verifikasi Akses...");
+            document.getElementById('errorBox').classList.add('hidden');
 
         fetchApi('validasiKode', kode, function(resString) {
             showLoader(false);
@@ -1160,6 +1172,10 @@
         }, function(err) {
             showLoader(false); showError("Koneksi internet terputus.");
         });
+        }, function() {
+            // Jika cek status gagal, default aman: tetap tampilkan screenLogin
+            showLoader(false);
+        });
     }
 
     function updateInfoStatus() {
@@ -1179,8 +1195,24 @@
     }
 
     function bukaDaftar() {
-        if (CONFIG.status_isian === 'selesai') changeScreen('screenLocked');
-        else changeScreen('screenDaftar');
+        // Cek status pendaftaran sebelum membuka form biodata
+        showLoader(true, "Memeriksa akses...");
+        fetchApi('getStatusPendaftaran', null, function(res) {
+            showLoader(false);
+            var status = res && res.status ? String(res.status).trim().toUpperCase() : 'TUTUP';
+            if (status !== 'BUKA') {
+                var pesan = (res && res.pesan) ? res.pesan : 'Pendaftaran sedang ditutup sementara.';
+                document.getElementById('pesanMaintenance').innerText = pesan;
+                changeScreen('screenMaintenance');
+                return;
+            }
+            // Status BUKA — lanjutkan seperti biasa
+            if (CONFIG.status_isian === 'selesai') changeScreen('screenLocked');
+            else changeScreen('screenDaftar');
+        }, function() {
+            // Jika cek status gagal, default aman: tetap di halaman saat ini
+            showLoader(false);
+        });
     }
 
     function pgmEsc(str) { return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
