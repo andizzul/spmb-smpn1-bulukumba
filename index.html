@@ -1007,7 +1007,11 @@
         var isValid = true;
         for (var j = 0; j < reqs.length; j++) { if(!reqs[j].value) isValid = false; }
         var niks = container.querySelectorAll('.nik-field');
-        for (var k = 0; k < niks.length; k++) { if(!checkNik(niks[k])) isValid = false; }
+        for (var k = 0; k < niks.length; k++) {
+            // Lewati field NIK yang disabled (misal: status Meninggal) — dianggap valid
+            if(niks[k].disabled) continue;
+            if(!checkNik(niks[k])) isValid = false;
+        }
         return isValid;
     }
 
