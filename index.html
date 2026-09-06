@@ -700,8 +700,8 @@
                         <div class="mb-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
                             <label class="form-label">Waktu Tempuh (<span id="lblTransport" class="text-blue-600">Transportasi</span>) <span class="required-star">*</span></label>
                             <div class="row g-2 mt-2">
-                                <div class="col-6"><input type="text" inputmode="numeric" name="lama_jam" class="form-control req step3-req text-center bg-white input-filled" required value="00" oninput="this.value=this.value.replace(/[^0-9]/g,''); if(this.value) this.classList.add('input-filled'); else { this.classList.remove('input-filled'); this.value='00'; }"></div>
-                                <div class="col-6"><input type="text" inputmode="numeric" name="lama_menit" class="form-control req step3-req text-center bg-white" required placeholder="Menit" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
+                                <div class="col-6"><input type="text" inputmode="numeric" name="lama_jam" id="inputLamaJam" class="form-control req step3-req text-center bg-white input-filled" required value="00 Jam" oninput="var n=this.value.replace(/[^0-9]/g,''); this.value=n+' Jam'; this.classList.add('input-filled');"></div>
+                                <div class="col-6"><input type="text" inputmode="numeric" name="lama_menit" id="inputLamaMenit" class="form-control req step3-req text-center bg-white" required value="00 Menit" oninput="var n=this.value.replace(/[^0-9]/g,''); this.value=n+' Menit'; if(n && n!=='00') this.classList.add('input-filled'); else this.classList.remove('input-filled');"></div>
                             </div>
                         </div>
 
@@ -1081,9 +1081,11 @@
         var nikIbu = document.getElementById('nikIbu');
         if (nikIbu) { nikIbu.disabled = false; }
 
-        // Reset kolom Jam ke nilai default '00'
+        // Reset kolom Jam dan Menit ke nilai default
         var lamaJam = document.querySelector('[name="lama_jam"]');
-        if (lamaJam) { lamaJam.value = '00'; lamaJam.classList.add('input-filled'); }
+        if (lamaJam) { lamaJam.value = '00 Jam'; lamaJam.classList.add('input-filled'); }
+        var lamaMenit = document.querySelector('[name="lama_menit"]');
+        if (lamaMenit) { lamaMenit.value = '00 Menit'; lamaMenit.classList.remove('input-filled'); }
 
         // Reset checkbox kesiapan & tombol kirim ke kondisi awal (terkunci)
         var checkSiap = document.getElementById('checkSiap');
@@ -1098,6 +1100,16 @@
     }
 
     function populateForm(data) {
+        // Pastikan nilai lama_jam dan lama_menit dari spreadsheet
+        // selalu mengandung satuan sebelum diisi ke form
+        if (data.lama_jam !== undefined) {
+            var j = String(data.lama_jam).replace(/[^0-9]/g,'') || '00';
+            data.lama_jam = j + ' Jam';
+        }
+        if (data.lama_menit !== undefined) {
+            var m = String(data.lama_menit).replace(/[^0-9]/g,'') || '00';
+            data.lama_menit = m + ' Menit';
+        }
         var form = document.getElementById('formBiodata');
         var elements = form.elements;
         for (var i = 0; i < elements.length; i++) {
