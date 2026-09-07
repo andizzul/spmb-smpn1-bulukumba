@@ -1083,6 +1083,14 @@
         // Validasi NISN: wajib tepat 10 digit, tidak bisa lanjut jika kurang
         var nisnEl = container.querySelector('[name="nisn"]');
         if(nisnEl) { checkNisn(nisnEl); if(nisnEl.value.trim().length !== 10) isValid = false; }
+        // Validasi Menit: nilai '00' dianggap belum diisi, wajib diganti
+        var menitEl = document.getElementById('inputLamaMenit');
+        if(menitEl && container.querySelector('[name="lama_menit"]')) {
+            if(waktuFormat(menitEl.value) === '00') {
+                menitEl.classList.remove('input-filled');
+                isValid = false;
+            }
+        }
         return isValid;
     }
 
