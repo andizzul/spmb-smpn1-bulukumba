@@ -731,7 +731,7 @@
                             <label class="form-label">Waktu Tempuh (<span id="lblTransport" class="text-blue-600">Transportasi</span>) <span class="required-star">*</span></label>
                             <div class="row g-2 mt-2">
                                 <div class="col-6 waktu-wrap" data-satuan="Jam"><input type="text" inputmode="numeric" name="lama_jam" id="inputLamaJam" class="form-control req step3-req text-center bg-white input-filled" required value="00" maxlength="2" onfocus="waktuFocus(this)" onblur="waktuBlur(this,true)" oninput="waktuInput(this,true)"></div>
-                                <div class="col-6 waktu-wrap" data-satuan="Menit"><input type="text" inputmode="numeric" name="lama_menit" id="inputLamaMenit" class="form-control req step3-req text-center bg-white" required value="00" maxlength="2" onfocus="waktuFocus(this)" onblur="waktuBlur(this,false)" oninput="waktuInput(this,false)"></div>
+                                <div class="col-6 waktu-wrap" data-satuan="Menit"><input type="text" inputmode="numeric" name="lama_menit" id="inputLamaMenit" class="form-control req step3-req text-center bg-white" required value="00" maxlength="2" onfocus="waktuFocus(this)" onblur="waktuBlur(this,false)" oninput="waktuInput(this,false)" data-init="true"></div>
                             </div>
                         </div>
 
@@ -995,6 +995,8 @@
     function waktuInput(el, isJam) {
         var n = el.value.replace(/[^0-9]/g, '').slice(0, 2);
         el.value = n;
+        // Hapus data-init saat pengguna mulai mengetik di kolom Menit
+        if (!isJam) el.removeAttribute('data-init');
         waktuAturWarna(el, n, isJam);
     }
 
@@ -1008,6 +1010,8 @@
         // Saat blur, format nilai menjadi 2 digit
         var n = waktuFormat(el.value);
         el.value = n;
+        // Hapus data-init saat pengguna mengklik lalu meninggalkan kolom Menit
+        if (!isJam) el.removeAttribute('data-init');
         waktuAturWarna(el, n, isJam);
     }
 
@@ -1025,7 +1029,12 @@
                 }
             }
         } else {
-            // Warna Menit: hijau jika Menit > 00 ATAU Jam > 00
+            // Warna Menit: abaikan pewarnaan saat pertama kali load (data-init masih ada)
+            if (el.getAttribute('data-init') === 'true') {
+                el.classList.remove('input-filled');
+                return;
+            }
+            // Hijau jika Menit > 00 ATAU Jam > 00
             var jamEl = document.getElementById('inputLamaJam');
             var jamVal = jamEl ? waktuFormat(jamEl.value) : '00';
             if (n !== '00' || jamVal !== '00') el.classList.add('input-filled');
@@ -1202,6 +1211,23 @@
             document.getElementById('errStep3').classList.remove('hidden');
             btn.className = "btn-modern bg-slate-200 text-slate-400 cursor-not-allowed flex-[2] transition-all duration-300";
             btn.disabled = true;
+            // Tandai kolom wajib Langkah 3 yang belum terisi dengan border merah
+            var container = document.getElementById('step3');
+            var manuals = container.querySelectorAll('input[required]:not([type="checkbox"]):not(.nik-field), textarea[required], select[required]');
+            for(var m=0; m<manuals.length; m++) {
+                if(!manuals[m].value || !manuals[m].value.trim()) manuals[m].classList.add('input-empty');
+                else manuals[m].classList.remove('input-empty');
+            }
+            // Cek khusus kolom Menit: merah jika Jam dan Menit keduanya 00
+            var jamEl   = document.getElementById('inputLamaJam');
+            var menitEl = document.getElementById('inputLamaMenit');
+            if(jamEl && menitEl) {
+                if(waktuFormat(jamEl.value) === '00' && waktuFormat(menitEl.value) === '00') {
+                    menitEl.classList.add('input-empty');
+                } else {
+                    menitEl.classList.remove('input-empty');
+                }
+            }
             return;
         }
         document.getElementById('errStep3').classList.add('hidden');
