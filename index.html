@@ -524,7 +524,13 @@
                         <div class="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
                             <label class="form-label mb-1">NIK (Nomor Induk Kependudukan) <span class="required-star">*</span></label>
                             <span class="nik-error mb-2"><i class="fas fa-info-circle"></i> NIK wajib persis 16 digit angka!</span>
-                            <input type="text" inputmode="numeric" maxlength="16" name="nik" class="form-control req nik-field bg-white" required placeholder="Contoh: 73020xxxxxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this);">
+                            <input type="text" inputmode="numeric" maxlength="16" name="nik" id="inputNik" class="form-control req nik-field bg-white" required placeholder="Contoh: 73020xxxxxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this); checkNikKK();">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label mb-1">No. Kartu Keluarga <span class="required-star">*</span></label>
+                            <span class="nik-error mb-2" id="errNomorKK"><i class="fas fa-info-circle"></i> <span id="pesanErrKK">No. KK wajib persis 16 digit angka!</span></span>
+                            <input type="text" inputmode="numeric" maxlength="16" name="nomor_kk" id="inputNomorKK" class="form-control req nik-field bg-white" required placeholder="16 digit Nomor Kartu Keluarga" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNomorKK(this);">
                         </div>
 
                         <div class="mb-3"><label class="form-label">Nomor Formulir <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="nomor_formulir" class="form-control req" required placeholder="Contoh: 001" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
@@ -543,6 +549,11 @@
                             <div class="col-5"><label class="form-label">Tgl Lahir <span class="required-star">*</span></label><input type="date" name="tanggal_lahir" class="form-control req" required></div>
                         </div>
                         
+                        <div class="mb-3">
+                            <label class="form-label mb-1">No. Registrasi Akta <span class="required-star">*</span></label>
+                            <input type="text" name="nomor_akta" id="inputNomorAkta" class="form-control req bg-white" required placeholder="Nomor Registrasi Akta Kelahiran" oninput="if(this.value) this.classList.add('input-filled'); else this.classList.remove('input-filled');">
+                        </div>
+
                         <div class="mb-3"><label class="form-label">Alamat Rumah (Sesuai KK) <span class="required-star">*</span></label><textarea name="alamat_rumah" class="form-control req" required rows="2" placeholder="Nama Jalan / Kampung..."></textarea></div>
                         
                         <div class="row g-2 mb-3">
@@ -583,7 +594,7 @@
                     </div>
 
                     <button type="button" onclick="nextStep(1)" class="btn-modern w-full bg-blue-600 text-white shadow-lg shadow-blue-500/30 active:scale-95">LANJUTKAN <i class="fas fa-chevron-right ml-1"></i></button>
-                    <div id="errStep1" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Mohon lengkapi isian kosong. Pastikan NIK 16 digit dan Tanggal lahir telah terisi.</div>
+                    <div id="errStep1" class="text-red-500 text-center text-[10px] font-bold mt-3 hidden">Mohon lengkapi isian kosong. Pastikan NIK & No. KK 16 digit, Akta & Tanggal lahir terisi.</div>
                 </div>
 
                 <!-- STEP 2: DATA ORANG TUA -->
@@ -1011,6 +1022,44 @@
         return payload;
     }
 
+    function checkNomorKK(el) {
+        if(!el) return;
+        var errBox  = document.getElementById('errNomorKK');
+        var pesanEl = document.getElementById('pesanErrKK');
+        var val = el.value.trim();
+        if(val.length > 0) {
+            if(val.length === 16) {
+                // Cek apakah sama dengan NIK
+                var nikEl = document.getElementById('inputNik');
+                var nikVal = nikEl ? nikEl.value.trim() : '';
+                if(nikVal && val === nikVal) {
+                    el.classList.remove('input-filled'); el.classList.add('invalid-nik');
+                    if(pesanEl) pesanEl.innerText = 'No. KK tidak boleh sama dengan NIK!';
+                    if(errBox) errBox.classList.add('show');
+                    return false;
+                }
+                el.classList.add('input-filled'); el.classList.remove('invalid-nik');
+                if(errBox) errBox.classList.remove('show');
+                return true;
+            } else {
+                el.classList.remove('input-filled'); el.classList.add('invalid-nik');
+                if(pesanEl) pesanEl.innerText = 'No. KK wajib persis 16 digit angka!';
+                if(errBox) errBox.classList.add('show');
+                return false;
+            }
+        } else {
+            el.classList.remove('input-filled', 'invalid-nik');
+            if(errBox) errBox.classList.remove('show');
+            return false;
+        }
+    }
+
+    function checkNikKK() {
+        // Dipanggil saat NIK diubah — re-validasi No. KK jika sudah terisi
+        var kkEl = document.getElementById('inputNomorKK');
+        if(kkEl && kkEl.value.trim().length > 0) checkNomorKK(kkEl);
+    }
+
     function checkNisn(el) {
         if(!el) return;
         var val = el.value.trim();
@@ -1096,6 +1145,12 @@
         // Validasi NISN: wajib tepat 10 digit, tidak bisa lanjut jika kurang
         var nisnEl = container.querySelector('[name="nisn"]');
         if(nisnEl) { checkNisn(nisnEl); if(nisnEl.value.trim().length !== 10) isValid = false; }
+        // Validasi No. KK: wajib 16 digit dan tidak sama dengan NIK
+        var kkEl = container.querySelector('[name="nomor_kk"]');
+        if(kkEl) { if(!checkNomorKK(kkEl)) isValid = false; }
+        // Validasi No. Akta: wajib terisi
+        var aktaEl = container.querySelector('[name="nomor_akta"]');
+        if(aktaEl) { if(!aktaEl.value.trim()) { aktaEl.classList.remove('input-filled'); isValid = false; } }
         // Validasi waktu tempuh: tolak hanya jika JAM dan MENIT keduanya '00'
         // Jika Jam sudah diisi (> 00), Menit boleh tetap '00' dan dianggap valid
         var jamEl   = document.getElementById('inputLamaJam');
@@ -1170,6 +1225,12 @@
         if (boxJarakKm) boxJarakKm.classList.add('hidden');
         var lblTransport = document.getElementById('lblTransport');
         if (lblTransport) lblTransport.innerText = 'Transportasi';
+
+        // Reset No. KK dan No. Akta
+        var nomorKKEl = document.getElementById('inputNomorKK');
+        if(nomorKKEl) { nomorKKEl.value = ''; nomorKKEl.classList.remove('input-filled', 'invalid-nik'); var errKK = document.getElementById('errNomorKK'); if(errKK) errKK.classList.remove('show'); }
+        var nomorAktaEl = document.getElementById('inputNomorAkta');
+        if(nomorAktaEl) { nomorAktaEl.value = ''; nomorAktaEl.classList.remove('input-filled'); }
 
         // Aktifkan kembali input NIK yang mungkin di-disabled saat status Meninggal
         var nikAyah = document.getElementById('nikAyah');
