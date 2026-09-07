@@ -983,8 +983,21 @@
     function waktuAturWarna(el, n, isJam) {
         if (isJam) {
             el.classList.add('input-filled');
+            // Jika Jam sudah terisi (> 00), Menit otomatis hijau
+            var menitEl = document.getElementById('inputLamaMenit');
+            if (menitEl) {
+                if (waktuFormat(el.value) !== '00') menitEl.classList.add('input-filled');
+                else {
+                    // Jam kembali ke 00 — kembalikan warna Menit ke aturan asalnya
+                    if (waktuFormat(menitEl.value) === '00') menitEl.classList.remove('input-filled');
+                    else menitEl.classList.add('input-filled');
+                }
+            }
         } else {
-            if (n !== '00') el.classList.add('input-filled');
+            // Warna Menit: hijau jika Menit > 00 ATAU Jam > 00
+            var jamEl = document.getElementById('inputLamaJam');
+            var jamVal = jamEl ? waktuFormat(jamEl.value) : '00';
+            if (n !== '00' || jamVal !== '00') el.classList.add('input-filled');
             else el.classList.remove('input-filled');
         }
     }
@@ -1083,13 +1096,20 @@
         // Validasi NISN: wajib tepat 10 digit, tidak bisa lanjut jika kurang
         var nisnEl = container.querySelector('[name="nisn"]');
         if(nisnEl) { checkNisn(nisnEl); if(nisnEl.value.trim().length !== 10) isValid = false; }
-        // Validasi Menit: nilai '00' dianggap belum diisi, wajib diganti
+        // Validasi waktu tempuh: tolak hanya jika JAM dan MENIT keduanya '00'
+        // Jika Jam sudah diisi (> 00), Menit boleh tetap '00' dan dianggap valid
+        var jamEl   = document.getElementById('inputLamaJam');
         var menitEl = document.getElementById('inputLamaMenit');
         if(menitEl && container.querySelector('[name="lama_menit"]')) {
-            if(waktuFormat(menitEl.value) === '00') {
+            var jamVal   = jamEl   ? waktuFormat(jamEl.value)   : '00';
+            var menitVal = menitEl ? waktuFormat(menitEl.value) : '00';
+            if(jamVal === '00' && menitVal === '00') {
+                // Kedua kolom masih 00 — belum ada waktu yang diisi, tolak
                 menitEl.classList.remove('input-filled');
                 isValid = false;
             }
+            // Jika Jam > 00, Menit boleh 00 — warna Menit tetap abu-abu (tidak hijau)
+            // tapi tidak menghalangi pengiriman data
         }
         return isValid;
     }
