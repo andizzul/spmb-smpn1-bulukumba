@@ -418,10 +418,10 @@
                     <span style="font-size:0.6rem;font-weight:600;color:#94a3b8">Jadwal</span>
                 </button>
                 <button type="button" class="bn-btn-center" onclick="var ic=this.querySelector('.bn-icon-c');ic.style.animation='none';void ic.offsetWidth;ic.style.animation='wiggle 0.3s ease';bukaDaftar()">
-                    <div class="bn-icon-c" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(145deg,#2563eb,#3b82f6);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px -4px rgba(37,99,235,0.5),0 0 0 5px #dbeafe">
-                        <i class="fas fa-user-edit" style="color:#fff;font-size:1.2rem"></i>
+                    <div id="btnBiodataIcon" class="bn-icon-c" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(145deg,#2563eb,#3b82f6);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px -4px rgba(37,99,235,0.5),0 0 0 5px #dbeafe">
+                        <i id="btnBiodataIco" class="fas fa-user-edit" style="color:#fff;font-size:1.2rem"></i>
                     </div>
-                    <span style="font-size:0.6rem;font-weight:900;color:#2563eb;text-align:center;line-height:1.2">Lengkapi<br>Biodata</span>
+                    <span id="btnBiodataLabel" style="font-size:0.6rem;font-weight:900;color:#2563eb;text-align:center;line-height:1.2">Lengkapi<br>Biodata</span>
                 </button>
                 <button type="button" class="bn-btn" onclick="var ic=this.querySelector('.bn-icon');ic.style.animation='none';void ic.offsetWidth;ic.style.animation='wiggle 0.3s ease';bukaScreenPengumuman()">
                     <div class="bn-icon" style="width:36px;height:36px;border-radius:12px;background:#f5f3ff;display:flex;align-items:center;justify-content:center">
@@ -1275,6 +1275,9 @@
                 el.style.textTransform = _nama ? 'none' : 'uppercase';
                 CONFIG.status_isian = (response.status_isian || '').toLowerCase();
 
+                // Perbarui tampilan tombol menu sesuai status
+                updateTombolBiodata();
+
                 // Reset total form biodata SEBELUM diisi ulang —
                 // mencegah data pendaftar sebelumnya (di sesi/login lain) tertinggal di form
                 resetFormBiodata();
@@ -1325,6 +1328,30 @@
             // Jika cek status gagal, default aman: tetap tampilkan screenLogin
             showLoader(false);
         });
+    }
+
+    function updateTombolBiodata() {
+        var iconWrap = document.getElementById('btnBiodataIcon');
+        var ico      = document.getElementById('btnBiodataIco');
+        var label    = document.getElementById('btnBiodataLabel');
+        if (!iconWrap || !ico || !label) return;
+        if (CONFIG.status_isian === 'selesai') {
+            // Tampilan Unduh Biodata — merah
+            iconWrap.style.background = 'linear-gradient(145deg,#dc2626,#ef4444)';
+            iconWrap.style.boxShadow  = '0 8px 24px -4px rgba(220,38,38,0.5),0 0 0 5px #fee2e2';
+            ico.className = 'fas fa-file-pdf';
+            ico.style.fontSize = '1.1rem';
+            label.innerHTML   = 'Unduh<br>Biodata';
+            label.style.color = '#dc2626';
+        } else {
+            // Tampilan default — Lengkapi Biodata biru
+            iconWrap.style.background = 'linear-gradient(145deg,#2563eb,#3b82f6)';
+            iconWrap.style.boxShadow  = '0 8px 24px -4px rgba(37,99,235,0.5),0 0 0 5px #dbeafe';
+            ico.className = 'fas fa-user-edit';
+            ico.style.fontSize = '1.2rem';
+            label.innerHTML   = 'Lengkapi<br>Biodata';
+            label.style.color = '#2563eb';
+        }
     }
 
     function updateInfoStatus() {
@@ -1548,6 +1575,7 @@
             if(isSuccess) {
                 // Perbarui status di memori agar bukaDaftar() tahu data sudah terkunci
                 CONFIG.status_isian = 'selesai';
+                updateTombolBiodata();
                 // Tampilkan konfirmasi singkat bahwa data telah tersimpan
                 showLoader(true, "✅ Data berhasil tersimpan!");
                 setTimeout(function() {
@@ -1569,6 +1597,7 @@
             if(isNetworkOrDomErr) {
                 // Data sudah tersimpan di sheet — perbarui status di memori
                 CONFIG.status_isian = 'selesai';
+                updateTombolBiodata();
                 showLoader(true, "✅ Data berhasil tersimpan!");
                 setTimeout(function() {
                     showLoader(false);
