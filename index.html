@@ -33,6 +33,7 @@
         
         .input-filled { border-color: var(--success) !important; background-color: #f0fdf4 !important; }
         .invalid-nik { border-color: var(--danger) !important; background-color: #fef2f2 !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+        .input-empty { border-color: var(--danger) !important; }
         .required-star { color: var(--danger); }
         
         /* Gradient Section Title */
@@ -524,13 +525,13 @@
                         <div class="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
                             <label class="form-label mb-1">NIK (Nomor Induk Kependudukan) <span class="required-star">*</span></label>
                             <span class="nik-error mb-2"><i class="fas fa-info-circle"></i> NIK wajib persis 16 digit angka!</span>
-                            <input type="text" inputmode="numeric" maxlength="16" name="nik" id="inputNik" class="form-control req nik-field bg-white" required placeholder="Contoh: 73020xxxxxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this); checkNikKK();">
+                            <input type="text" inputmode="numeric" maxlength="16" name="nik" id="inputNik" class="form-control req nik-field" required oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNik(this); checkNikKK();">
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label mb-1">No. Kartu Keluarga <span class="required-star">*</span></label>
                             <span class="nik-error mb-2" id="errNomorKK"><i class="fas fa-info-circle"></i> <span id="pesanErrKK">No. KK wajib persis 16 digit angka!</span></span>
-                            <input type="text" inputmode="numeric" maxlength="16" name="nomor_kk" id="inputNomorKK" class="form-control req nik-field bg-white" required placeholder="16 digit Nomor Kartu Keluarga" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNomorKK(this);">
+                            <input type="text" inputmode="numeric" maxlength="16" name="nomor_kk" id="inputNomorKK" class="form-control req nik-field" required oninput="this.value=this.value.replace(/[^0-9]/g,''); checkNomorKK(this);">
                         </div>
 
                         <div class="mb-3"><label class="form-label">Nomor Formulir <span class="required-star">*</span></label><input type="text" inputmode="numeric" name="nomor_formulir" class="form-control req" required placeholder="Contoh: 001" oninput="this.value=this.value.replace(/[^0-9]/g,'');"></div>
@@ -551,10 +552,10 @@
                         
                         <div class="mb-3">
                             <label class="form-label mb-1">No. Registrasi Akta <span class="required-star">*</span></label>
-                            <input type="text" name="nomor_akta" id="inputNomorAkta" class="form-control req bg-white" required placeholder="Nomor Registrasi Akta Kelahiran" oninput="if(this.value) this.classList.add('input-filled'); else this.classList.remove('input-filled');">
+                            <input type="text" name="nomor_akta" id="inputNomorAkta" class="form-control req" required oninput="if(this.value) this.classList.add('input-filled'); else this.classList.remove('input-filled');">
                         </div>
 
-                        <div class="mb-3"><label class="form-label">Alamat Rumah (Sesuai KK) <span class="required-star">*</span></label><textarea name="alamat_rumah" class="form-control req" required rows="2" placeholder="Nama Jalan / Kampung..."></textarea></div>
+                        <div class="mb-3"><label class="form-label">Alamat Rumah (Sesuai KK) <span class="required-star">*</span></label><textarea name="alamat_rumah" class="form-control req" required rows="2" placeholder="Nama Jalan"></textarea></div>
                         
                         <div class="row g-2 mb-3">
                             <div class="col-6"><label class="form-label">Dusun/Lingk. <span class="required-star">*</span></label><input type="text" name="dusun" class="form-control req" required></div>
@@ -902,6 +903,13 @@
     function nextStep(currentStep) {
         if(!validateStep(currentStep)) {
             document.getElementById('errStep'+currentStep).classList.remove('hidden');
+            // Tandai kolom manual wajib yang masih kosong dengan border merah
+            var container = document.getElementById('step'+currentStep);
+            var manuals = container.querySelectorAll('input[required]:not([type="date"]):not(.nik-field):not([type="checkbox"]), textarea[required]');
+            for(var m=0; m<manuals.length; m++) {
+                if(!manuals[m].value.trim()) manuals[m].classList.add('input-empty');
+                else manuals[m].classList.remove('input-empty');
+            }
             return;
         }
         document.getElementById('errStep'+currentStep).classList.add('hidden');
@@ -1120,7 +1128,7 @@
         document.getElementById('formBiodata').addEventListener('input', function(e) {
             if(e.target.classList.contains('req')) {
                 if(!e.target.classList.contains('nik-field')) {
-                    if(e.target.value) e.target.classList.add('input-filled');
+                    if(e.target.value) { e.target.classList.add('input-filled'); e.target.classList.remove('input-empty'); }
                     else e.target.classList.remove('input-filled');
                 }
             }
