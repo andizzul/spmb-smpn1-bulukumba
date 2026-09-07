@@ -251,7 +251,25 @@
             <p style="color:#475569;font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">SMP Negeri 1 Bulukumba</p>
         </div>
         <style>
-            @keyframes mtn-pulse {
+            /* Wrapper kolom Waktu Tempuh — overlay satuan via ::after */
+        .waktu-wrap { position: relative; }
+        .waktu-wrap::after {
+            content: attr(data-satuan);
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: #94a3b8;
+            pointer-events: none;
+            letter-spacing: 0.02em;
+        }
+        #inputLamaJam, #inputLamaMenit {
+            padding-right: 2.4rem;
+            text-align: left;
+        }
+        @keyframes mtn-pulse {
                 0%,100% { box-shadow:0 0 0 16px rgba(99,102,241,0.12),0 0 0 32px rgba(99,102,241,0.06); }
                 50%     { box-shadow:0 0 0 22px rgba(99,102,241,0.18),0 0 0 44px rgba(99,102,241,0.08); }
             }
@@ -700,8 +718,8 @@
                         <div class="mb-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
                             <label class="form-label">Waktu Tempuh (<span id="lblTransport" class="text-blue-600">Transportasi</span>) <span class="required-star">*</span></label>
                             <div class="row g-2 mt-2">
-                                <div class="col-6"><input type="text" inputmode="numeric" name="lama_jam" id="inputLamaJam" class="form-control req step3-req text-center bg-white input-filled" required value="00 Jam" oninput="var n=this.value.replace(/[^0-9]/g,''); this.value=n+' Jam'; this.classList.add('input-filled');"></div>
-                                <div class="col-6"><input type="text" inputmode="numeric" name="lama_menit" id="inputLamaMenit" class="form-control req step3-req text-center bg-white" required value="00 Menit" oninput="var n=this.value.replace(/[^0-9]/g,''); this.value=n+' Menit'; if(n && n!=='00') this.classList.add('input-filled'); else this.classList.remove('input-filled');"></div>
+                                <div class="col-6 waktu-wrap" data-satuan="Jam"><input type="text" inputmode="numeric" name="lama_jam" id="inputLamaJam" class="form-control req step3-req text-center bg-white input-filled" required value="00" maxlength="2" onfocus="waktuFocus(this)" onblur="waktuBlur(this,true)" oninput="waktuInput(this,true)"></div>
+                                <div class="col-6 waktu-wrap" data-satuan="Menit"><input type="text" inputmode="numeric" name="lama_menit" id="inputLamaMenit" class="form-control req step3-req text-center bg-white" required value="00" maxlength="2" onfocus="waktuFocus(this)" onblur="waktuBlur(this,false)" oninput="waktuInput(this,false)"></div>
                             </div>
                         </div>
 
@@ -930,6 +948,56 @@
         if(status !== 'Meninggal') checkNik(inputNik);
     }
 
+    // ── Fungsi pengelola kolom Waktu Tempuh (Jam & Menit) ──
+    // Input hanya menyimpan angka (max 2 digit).
+    // Satuan tampil sebagai overlay ::after pada wrapper .waktu-wrap[data-satuan].
+    // Nilai yang dikirim ke spreadsheet = angka + ' ' + satuan (digabung saat submit).
+
+    function waktuFormat(val) {
+        // Ekstrak angka, batasi 2 digit, pad ke 2 digit
+        var n = val.replace(/[^0-9]/g, '').slice(0, 2);
+        if (n === '') n = '00';
+        if (n.length === 1) n = '0' + n;
+        return n;
+    }
+
+    function waktuInput(el, isJam) {
+        var n = el.value.replace(/[^0-9]/g, '').slice(0, 2);
+        el.value = n;
+        waktuAturWarna(el, n, isJam);
+    }
+
+    function waktuFocus(el) {
+        // Posisikan kursor di akhir angka
+        var len = el.value.length;
+        setTimeout(function() { el.setSelectionRange(len, len); }, 0);
+    }
+
+    function waktuBlur(el, isJam) {
+        // Saat blur, format nilai menjadi 2 digit
+        var n = waktuFormat(el.value);
+        el.value = n;
+        waktuAturWarna(el, n, isJam);
+    }
+
+    function waktuAturWarna(el, n, isJam) {
+        if (isJam) {
+            el.classList.add('input-filled');
+        } else {
+            if (n !== '00') el.classList.add('input-filled');
+            else el.classList.remove('input-filled');
+        }
+    }
+
+    // Gabungkan angka + satuan saat data akan dikirim ke spreadsheet
+    function waktuGabungPayload(payload) {
+        var jam = document.getElementById('inputLamaJam');
+        var menit = document.getElementById('inputLamaMenit');
+        if (jam)   payload['lama_jam']   = waktuFormat(jam.value)   + ' Jam';
+        if (menit) payload['lama_menit'] = waktuFormat(menit.value) + ' Menit';
+        return payload;
+    }
+
     function checkNisn(el) {
         if(!el) return;
         var val = el.value.trim();
@@ -1083,9 +1151,9 @@
 
         // Reset kolom Jam dan Menit ke nilai default
         var lamaJam = document.querySelector('[name="lama_jam"]');
-        if (lamaJam) { lamaJam.value = '00 Jam'; lamaJam.classList.add('input-filled'); }
+        if (lamaJam) { lamaJam.value = '00'; lamaJam.classList.add('input-filled'); }
         var lamaMenit = document.querySelector('[name="lama_menit"]');
-        if (lamaMenit) { lamaMenit.value = '00 Menit'; lamaMenit.classList.remove('input-filled'); }
+        if (lamaMenit) { lamaMenit.value = '00'; lamaMenit.classList.remove('input-filled'); }
 
         // Reset checkbox kesiapan & tombol kirim ke kondisi awal (terkunci)
         var checkSiap = document.getElementById('checkSiap');
@@ -1103,12 +1171,14 @@
         // Pastikan nilai lama_jam dan lama_menit dari spreadsheet
         // selalu mengandung satuan sebelum diisi ke form
         if (data.lama_jam !== undefined) {
-            var j = String(data.lama_jam).replace(/[^0-9]/g,'') || '00';
-            data.lama_jam = j + ' Jam';
+            var j = String(data.lama_jam).replace(/[^0-9]/g,'').slice(0,2) || '00';
+            if (j.length === 1) j = '0' + j;
+            data.lama_jam = j; // input hanya terima angka, satuan tampil via CSS overlay
         }
         if (data.lama_menit !== undefined) {
-            var m = String(data.lama_menit).replace(/[^0-9]/g,'') || '00';
-            data.lama_menit = m + ' Menit';
+            var m = String(data.lama_menit).replace(/[^0-9]/g,'').slice(0,2) || '00';
+            if (m.length === 1) m = '0' + m;
+            data.lama_menit = m; // input hanya terima angka, satuan tampil via CSS overlay
         }
         var form = document.getElementById('formBiodata');
         var elements = form.elements;
@@ -1421,6 +1491,8 @@
         if(nikAyahEl && nikAyahEl.disabled) payload['nik_ayah'] = nikAyahEl.value;
         var nikIbuEl = document.getElementById('nikIbu');
         if(nikIbuEl && nikIbuEl.disabled) payload['nik_ibu'] = nikIbuEl.value;
+        // Gabungkan angka + satuan untuk kolom waktu tempuh
+        payload = waktuGabungPayload(payload);
         fetchApi('saveData', payload);
     }
 
@@ -1437,6 +1509,8 @@
         if(nikAyahEl && nikAyahEl.disabled) payload['nik_ayah'] = nikAyahEl.value;
         var nikIbuEl = document.getElementById('nikIbu');
         if(nikIbuEl && nikIbuEl.disabled) payload['nik_ibu'] = nikIbuEl.value;
+        // Gabungkan angka + satuan untuk kolom waktu tempuh
+        payload = waktuGabungPayload(payload);
 
         fetchApi('saveData', payload, function(response) {
             showLoader(false);
