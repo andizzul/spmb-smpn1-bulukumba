@@ -1140,8 +1140,9 @@
         document.getElementById('formBiodata').addEventListener('input', function(e) {
             if(e.target.classList.contains('req')) {
                 if(e.target.tagName === 'SELECT') {
-                    // Select: hapus merah saat sudah dipilih
-                    if(e.target.value) e.target.classList.remove('input-empty');
+                    // Select: hijau jika sudah dipilih, hapus merah
+                    if(e.target.value) { e.target.classList.add('input-filled'); e.target.classList.remove('input-empty'); }
+                    else e.target.classList.remove('input-filled');
                 } else if(!e.target.classList.contains('nik-field')) {
                     if(e.target.value) { e.target.classList.add('input-filled'); e.target.classList.remove('input-empty'); }
                     else e.target.classList.remove('input-filled');
