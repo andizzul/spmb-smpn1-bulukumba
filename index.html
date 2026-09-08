@@ -1407,7 +1407,7 @@
                 if (draftBox) {
                     draftBox.style.display = 'flex';
                     const dataObj = response.data || {};
-                    const fieldTerisi = Object.keys(dataObj).filter(k => k !== 'kode_otorisasi' && k !== 'status_isian' && dataObj[k] && dataObj[k].toString().trim() !== '').length;
+                    const fieldTerisi = Object.keys(dataObj).filter(k => k !== 'kode_otorisasi' && k !== 'status_isian' && k !== 'waktu_pendaftaran' && dataObj[k] && dataObj[k].toString().trim() !== '').length;
                     const lblStatus = document.getElementById('lblStatusDraft');
                     const titleStatus = lblStatus.previousElementSibling; 
                     const iconDraft = document.querySelector('#infoDraft i');
