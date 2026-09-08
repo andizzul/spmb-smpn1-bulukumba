@@ -1231,6 +1231,14 @@
             return;
         }
         document.getElementById('errStep3').classList.add('hidden');
+        // Validasi sukses — pastikan input-empty pada Menit dihapus jika Jam sudah terisi
+        var jamElOk   = document.getElementById('inputLamaJam');
+        var menitElOk = document.getElementById('inputLamaMenit');
+        if(jamElOk && menitElOk) {
+            if(waktuFormat(jamElOk.value) !== '00' || waktuFormat(menitElOk.value) !== '00') {
+                menitElOk.classList.remove('input-empty');
+            }
+        }
         if(check.checked) {
             btn.disabled = false;
             btn.className = "btn-modern bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/40 active:scale-95 flex-[2] transition-all duration-300";
