@@ -557,11 +557,11 @@
 
                         <div class="mb-3"><label class="form-label">Alamat Rumah (Sesuai KK) <span class="required-star">*</span></label><textarea name="alamat_rumah" class="form-control req" required rows="2" placeholder="Nama Jalan"></textarea></div>
                         
-                        <div class="mb-3"><label class="form-label">Jenis Wilayah <span class="required-star">*</span></label><select name="jenis_wilayah" class="form-control req" required><option value="">-- Pilih Jenis Wilayah --</option><option value="Pedesaan">Pedesaan (Dusun / Desa)</option><option value="Perkotaan">Perkotaan (Lingkungan / Kelurahan)</option></select></div>
+                        <div class="mb-3"><label class="form-label">Jenis Wilayah <span class="required-star">*</span></label><select name="jenis_wilayah" class="form-control req" required onchange="ubahLabelWilayah(this.value)"><option value="">-- Pilih Jenis Wilayah --</option><option value="Pedesaan">Pedesaan (Dusun / Desa)</option><option value="Perkotaan">Perkotaan (Lingkungan / Kelurahan)</option></select></div>
                         
                         <div class="row g-2 mb-3">
-                            <div class="col-6"><label class="form-label">Dusun/Lingk. <span class="required-star">*</span></label><input type="text" name="dusun" class="form-control req" required></div>
-                            <div class="col-6"><label class="form-label">Desa/Kelur. <span class="required-star">*</span></label><input type="text" name="desa_kelurahan" class="form-control req" required></div>
+                            <div class="col-6"><label class="form-label" id="lblDusun">Dusun/Lingk. <span class="required-star">*</span></label><input type="text" name="dusun" class="form-control req" required></div>
+                            <div class="col-6"><label class="form-label" id="lblDesa">Desa/Kelur. <span class="required-star">*</span></label><input type="text" name="desa_kelurahan" class="form-control req" required></div>
                         </div>
                         
                         <div class="mb-3"><label class="form-label">Kecamatan <span class="required-star">*</span></label><input type="text" name="kecamatan" class="form-control req" required></div>
@@ -1053,6 +1053,22 @@
         return payload;
     }
 
+    function ubahLabelWilayah(val) {
+        var lblDusun = document.getElementById('lblDusun');
+        var lblDesa  = document.getElementById('lblDesa');
+        if (!lblDusun || !lblDesa) return;
+        if (val === 'Pedesaan') {
+            lblDusun.innerHTML = 'Dusun <span class="required-star">*</span>';
+            lblDesa.innerHTML  = 'Desa <span class="required-star">*</span>';
+        } else if (val === 'Perkotaan') {
+            lblDusun.innerHTML = 'Lingkungan <span class="required-star">*</span>';
+            lblDesa.innerHTML  = 'Kelurahan <span class="required-star">*</span>';
+        } else {
+            lblDusun.innerHTML = 'Dusun/Lingk. <span class="required-star">*</span>';
+            lblDesa.innerHTML  = 'Desa/Kelur. <span class="required-star">*</span>';
+        }
+    }
+
     function checkNomorKK(el) {
         if(!el) return;
         var errBox  = document.getElementById('errNomorKK');
@@ -1336,8 +1352,9 @@
             if(el.name && data[el.name] && data[el.name] !== "-" && data[el.name] !== "") {
                 el.value = data[el.name];
                 if(el.name === 'tinggal_bersama') cekWali();
-                if(el.name === 'status_ayah') cekStatusOrangTua('statAyah', 'nikAyah');
-                if(el.name === 'status_ibu')  cekStatusOrangTua('statIbu',  'nikIbu');
+                if(el.name === 'status_ayah')   cekStatusOrangTua('statAyah', 'nikAyah');
+                if(el.name === 'status_ibu')     cekStatusOrangTua('statIbu',  'nikIbu');
+                if(el.name === 'jenis_wilayah')  ubahLabelWilayah(el.value);
                 if(el.name === 'jarak_kategori') cekJarak();
                 if(el.name === 'transportasi') updateTransportLabel();
                 if(el.classList.contains('nik-field')) checkNik(el);
